@@ -3,6 +3,7 @@
 #include <qjsonobject.h>
 #include <qjsonarray.h>
 #include <qfile.h>
+#include <qvector.h>
 
 /****************************************************************************************************/
 /*                                           TO JSON                                                */
