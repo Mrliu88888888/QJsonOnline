@@ -17,6 +17,14 @@ QJsonArray _ToJson(const QList<T>& l)
     }
     return j;
 }
+template <> QJsonArray _ToJson(const QList<bool>& l)
+{
+    QJsonArray j;
+    for (auto v : l) {
+        j.append(v);
+    }
+    return j;
+}
 template <> QJsonArray _ToJson(const QList<int>& l)
 {
     QJsonArray j;
@@ -52,6 +60,14 @@ QJsonArray _ToJson(const QVector<T>& v)
     }
     return j;
 }
+template <> QJsonArray _ToJson(const QVector<bool>& v)
+{
+    QJsonArray j;
+    for (auto _v : v) {
+        j.append(_v);
+    }
+    return j;
+}
 template <> QJsonArray _ToJson(const QVector<int>& v)
 {
     QJsonArray j;
@@ -80,9 +96,10 @@ template <> QJsonArray _ToJson(const QVector<QString>& v)
 // Object
 template<class T>
 inline QJsonObject _ToJson(const T& v) { return v._toObject(); }
-inline QString _ToJson(const QString& s) { return s; }
+inline bool _ToJson(const bool& b) { return b; }
 inline int _ToJson(const int& i) { return i; }
 inline double _ToJson(const double& d) { return d; }
+inline QString _ToJson(const QString& s) { return s; }
 
 /****************************************************************************************************/
 /*                                           FROM JSON                                              */
@@ -95,6 +112,15 @@ QList<T> _FromJson(const QJsonValue& j, const QList<T>& _type)
     const auto& _j = j.toArray();
     for (const auto& v : _j) {
         l.append(v.toObject());
+    }
+    return l;
+}
+template <> QList<bool> _FromJson(const QJsonValue& j, const QList<bool>& _type)
+{
+    QList<bool> l;
+    const auto& _j = j.toArray();
+    for (const auto& v : _j) {
+        l.append(v.toBool());
     }
     return l;
 }
@@ -137,6 +163,15 @@ QVector<T> _FromJson(const QJsonValue& j, const QVector<T>& _type)
     }
     return l;
 }
+template <> QVector<bool> _FromJson(const QJsonValue& j, const QVector<bool>& _type)
+{
+    QVector<bool> l;
+    const auto& _j = j.toArray();
+    for (const auto& v : _j) {
+        l.append(v.toBool());
+    }
+    return l;
+}
 template <> QVector<int> _FromJson(const QJsonValue& j, const QVector<int>& _type)
 {
     QVector<int> l;
@@ -168,6 +203,7 @@ template <> QVector<QString> _FromJson(const QJsonValue& j, const QVector<QStrin
 // Object
 template<class T>
 inline T _FromJson(const QJsonValue& j, const T& _type) { return j.toObject(); }
+bool _FromJson(const QJsonValue& j, const bool& _type) { return j.toBool(); }
 int _FromJson(const QJsonValue& j, const int& _type) { return j.toInt(); }
 double _FromJson(const QJsonValue& j, const double& _type) { return j.toDouble(); }
 QString _FromJson(const QJsonValue& j, const QString& _type) { return j.toString(); }
@@ -177,13 +213,17 @@ QString _FromJson(const QJsonValue& j, const QString& _type) { return j.toString
 /****************************************************************************************************/
 #define _QSTR(s) #s
 
+inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remove(0, 1) : str; }
+
+#define _QJSON_STR_KEY(KEY) _QJSON_KEY(QString(_QSTR(KEY)))
+
 #define _QJSON_EXPAND_FROM(KEY) \
-    KEY = _FromJson(j.value(_QSTR(KEY)), KEY);
+    KEY = _FromJson(j.value(_QJSON_STR_KEY(KEY)), KEY);
 
 #define _QJSON_EXPAND_TO(KEY) \
-    j[_QSTR(KEY)] = _ToJson(KEY);
+    j[_QJSON_STR_KEY(KEY)] = _ToJson(KEY);
 
-#define _QJSON_ONLINE_CODE_BEGIN(CLASS) CLASS(const QJsonObject& j) { _fromJson(j); } CLASS(const QByteArray& s) { _fromJson(s); } CLASS(QFile& f) { _fromJson(f); } virtual void _fromJson(const QJsonObject& j) {
+#define _QJSON_ONLINE_CODE_BEGIN(CLASS) public: CLASS(const QJsonObject& j) { _fromJson(j); } CLASS(const QByteArray& s) { _fromJson(s); } CLASS(QFile& f) { _fromJson(f); } virtual void _fromJson(const QJsonObject& j) {
 #define _QJSON_ONLINE_CODE_PART } inline void _fromJson(const QByteArray& s) { _fromJson(QJsonDocument::fromJson(s).object()); } void _fromJson(QFile& f) { if (f.open(QIODevice::ReadOnly)) { _fromJson(f.readAll()); f.close(); } } virtual QJsonObject _toObject() const { QJsonObject j;
 #define _QJSON_ONLINE_CODE_END return j; } inline QByteArray _toJson(QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(_toObject()).toJson(format); } bool _toJson(QFile& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(_toJson(format)); f.flush(); f.close(); return true; } return false; }
 
@@ -637,17 +677,17 @@ QString _FromJson(const QJsonValue& j, const QString& _type) { return j.toString
 /*                                           EXPORT                                                 */
 /****************************************************************************************************/
 
-#define PRIVATE_MACRO_VAR_ARGS_IMPL_COUNT(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,_60,_61,_62,_63,_64,N,...) N
-#define PRIVATE_MACRO_VAR_ARGS_IMPL(args) PRIVATE_MACRO_VAR_ARGS_IMPL_COUNT args
-#define COUNT_MACRO_VAR_ARGS(...) PRIVATE_MACRO_VAR_ARGS_IMPL((__VA_ARGS__,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1))
+#define _PRIVATE_MACRO_VAR_ARGS_IMPL_COUNT(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,_60,_61,_62,_63,_64,N,...) N
+#define _PRIVATE_MACRO_VAR_ARGS_IMPL(args) _PRIVATE_MACRO_VAR_ARGS_IMPL_COUNT args
+#define _COUNT_MACRO_VAR_ARGS(...) _PRIVATE_MACRO_VAR_ARGS_IMPL((__VA_ARGS__,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1))
 
-#define PRIVATE_MACRO_CHOOSE_HELPER2(M, count) M##count
-#define PRIVATE_MACRO_CHOOSE_HELPER1(M, count) PRIVATE_MACRO_CHOOSE_HELPER2(M, count)
-#define PRIVATE_MACRO_CHOOSE_HELPER(M, count) PRIVATE_MACRO_CHOOSE_HELPER1(M, count)
+#define _PRIVATE_MACRO_CHOOSE_HELPER2(M, count) M##count
+#define _PRIVATE_MACRO_CHOOSE_HELPER1(M, count) _PRIVATE_MACRO_CHOOSE_HELPER2(M, count)
+#define _PRIVATE_MACRO_CHOOSE_HELPER(M, count) _PRIVATE_MACRO_CHOOSE_HELPER1(M, count)
 
 #ifdef WIN32
-#define EXPAND(...) __VA_ARGS__
-#define QJSON_ONLINE(...) EXPAND(PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__))
+#define _EXPAND(...) __VA_ARGS__
+#define QJSON_ONLINE(...) _EXPAND(_PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, _COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__))
 #else
-#define QJSON_ONLINE(...) PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__)
+#define QJSON_ONLINE(...) _PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, _COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__)
 #endif
