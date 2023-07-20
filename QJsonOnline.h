@@ -75,7 +75,7 @@ QVector<T> _FromJson(const QJsonValue& j, const QVector<T>&)
     QVector<T> l;
     const auto& _j = j.toArray();
     for (const auto& v : _j) {
-        l.append(v.toJsonObject());
+        l.append(v.toObject());
     }
     return l;
 }
