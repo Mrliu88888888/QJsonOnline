@@ -1,4 +1,7 @@
 ﻿#pragma once
+#ifndef QJSON_ONLINE_H
+#define QJSON_ONLINE_H
+
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qjsonarray.h>
@@ -10,42 +13,42 @@
 /****************************************************************************************************/
 // QList
 template<class T>
-QJsonArray _ToJson(const QList<T>& l)
+static inline QJsonArray _ToJson(const QList<T>& l)
 {
     QJsonArray j;
-    for (auto v : l) {
-        j.append(v._toObject());
+    for (const auto& v : l) {
+        j.append(v.toObject());
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QList<bool>& l)
+template <> static inline QJsonArray _ToJson(const QList<bool>& l)
 {
     QJsonArray j;
-    for (auto v : l) {
+    for (const auto& v : l) {
         j.append(v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QList<int>& l)
+template <> static inline QJsonArray _ToJson(const QList<int>& l)
 {
     QJsonArray j;
-    for (auto v : l) {
+    for (const auto& v : l) {
         j.append(v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QList<double>& l)
+template <> static inline QJsonArray _ToJson(const QList<double>& l)
 {
     QJsonArray j;
-    for (auto v : l) {
+    for (const auto& v : l) {
         j.append(v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QList<QString>& l)
+template <> static inline QJsonArray _ToJson(const QList<QString>& l)
 {
     QJsonArray j;
-    for (auto v : l) {
+    for (const auto& v : l) {
         j.append(v);
     }
     return j;
@@ -53,42 +56,42 @@ template <> QJsonArray _ToJson(const QList<QString>& l)
 
 // QVector
 template<class T>
-QJsonArray _ToJson(const QVector<T>& v)
+static inline QJsonArray _ToJson(const QVector<T>& v)
 {
     QJsonArray j;
-    for (auto _v : v) {
-        j.append(_v._toObject());
+    for (const auto& _v : v) {
+        j.append(_v.toObject());
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QVector<bool>& v)
+template <> static inline QJsonArray _ToJson(const QVector<bool>& v)
 {
     QJsonArray j;
-    for (auto _v : v) {
+    for (const auto& _v : v) {
         j.append(_v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QVector<int>& v)
+template <> static inline QJsonArray _ToJson(const QVector<int>& v)
 {
     QJsonArray j;
-    for (auto _v : v) {
+    for (const auto& _v : v) {
         j.append(_v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QVector<double>& v)
+template <> static inline QJsonArray _ToJson(const QVector<double>& v)
 {
     QJsonArray j;
-    for (auto _v : v) {
+    for (const auto& _v : v) {
         j.append(_v);
     }
     return j;
 }
-template <> QJsonArray _ToJson(const QVector<QString>& v)
+template <> static inline QJsonArray _ToJson(const QVector<QString>& v)
 {
     QJsonArray j;
-    for (auto _v : v) {
+    for (const auto& _v : v) {
         j.append(_v);
     }
     return j;
@@ -96,18 +99,18 @@ template <> QJsonArray _ToJson(const QVector<QString>& v)
 
 // Object
 template<class T>
-inline QJsonObject _ToJson(const T& v) { return v._toObject(); }
-inline bool _ToJson(const bool& b) { return b; }
-inline int _ToJson(const int& i) { return i; }
-inline double _ToJson(const double& d) { return d; }
-inline QString _ToJson(const QString& s) { return s; }
+static inline QJsonObject _ToJson(const T& v) { return v.toObject(); }
+static inline bool _ToJson(const bool& b) { return b; }
+static inline int _ToJson(const int& i) { return i; }
+static inline double _ToJson(const double& d) { return d; }
+static inline QString _ToJson(const QString& s) { return s; }
 
 /****************************************************************************************************/
 /*                                           FROM JSON                                              */
 /****************************************************************************************************/
 // QList
 template<class T>
-QList<T> _FromJson(const QJsonValue& j, const QList<T>& _type)
+static inline QList<T> _FromJson(const QJsonValue& j, const QList<T>& _type)
 {
     QList<T> l;
     const auto& _j = j.toArray();
@@ -116,7 +119,7 @@ QList<T> _FromJson(const QJsonValue& j, const QList<T>& _type)
     }
     return l;
 }
-template <> QList<bool> _FromJson(const QJsonValue& j, const QList<bool>& _type)
+template <> static inline QList<bool> _FromJson(const QJsonValue& j, const QList<bool>& _type)
 {
     QList<bool> l;
     const auto& _j = j.toArray();
@@ -125,7 +128,7 @@ template <> QList<bool> _FromJson(const QJsonValue& j, const QList<bool>& _type)
     }
     return l;
 }
-template <> QList<int> _FromJson(const QJsonValue& j, const QList<int>& _type)
+template <> static inline QList<int> _FromJson(const QJsonValue& j, const QList<int>& _type)
 {
     QList<int> l;
     const auto& _j = j.toArray();
@@ -134,7 +137,7 @@ template <> QList<int> _FromJson(const QJsonValue& j, const QList<int>& _type)
     }
     return l;
 }
-template <> QList<double> _FromJson(const QJsonValue& j, const QList<double>& _type)
+template <> static inline QList<double> _FromJson(const QJsonValue& j, const QList<double>& _type)
 {
     QList<double> l;
     const auto& _j = j.toArray();
@@ -143,7 +146,7 @@ template <> QList<double> _FromJson(const QJsonValue& j, const QList<double>& _t
     }
     return l;
 }
-template <> QList<QString> _FromJson(const QJsonValue& j, const QList<QString>& _type)
+template <> static inline QList<QString> _FromJson(const QJsonValue& j, const QList<QString>& _type)
 {
     QList<QString> l;
     const auto& _j = j.toArray();
@@ -155,7 +158,7 @@ template <> QList<QString> _FromJson(const QJsonValue& j, const QList<QString>& 
 
 // QVector
 template<class T>
-QVector<T> _FromJson(const QJsonValue& j, const QVector<T>& _type)
+static inline QVector<T> _FromJson(const QJsonValue& j, const QVector<T>& _type)
 {
     QVector<T> l;
     const auto& _j = j.toArray();
@@ -164,7 +167,7 @@ QVector<T> _FromJson(const QJsonValue& j, const QVector<T>& _type)
     }
     return l;
 }
-template <> QVector<bool> _FromJson(const QJsonValue& j, const QVector<bool>& _type)
+template <> static inline QVector<bool> _FromJson(const QJsonValue& j, const QVector<bool>& _type)
 {
     QVector<bool> l;
     const auto& _j = j.toArray();
@@ -173,7 +176,7 @@ template <> QVector<bool> _FromJson(const QJsonValue& j, const QVector<bool>& _t
     }
     return l;
 }
-template <> QVector<int> _FromJson(const QJsonValue& j, const QVector<int>& _type)
+template <> static inline QVector<int> _FromJson(const QJsonValue& j, const QVector<int>& _type)
 {
     QVector<int> l;
     const auto& _j = j.toArray();
@@ -182,7 +185,7 @@ template <> QVector<int> _FromJson(const QJsonValue& j, const QVector<int>& _typ
     }
     return l;
 }
-template <> QVector<double> _FromJson(const QJsonValue& j, const QVector<double>& _type)
+template <> static inline QVector<double> _FromJson(const QJsonValue& j, const QVector<double>& _type)
 {
     QVector<double> l;
     const auto& _j = j.toArray();
@@ -191,7 +194,7 @@ template <> QVector<double> _FromJson(const QJsonValue& j, const QVector<double>
     }
     return l;
 }
-template <> QVector<QString> _FromJson(const QJsonValue& j, const QVector<QString>& _type)
+template <> static inline QVector<QString> _FromJson(const QJsonValue& j, const QVector<QString>& _type)
 {
     QVector<QString> l;
     const auto& _j = j.toArray();
@@ -203,18 +206,18 @@ template <> QVector<QString> _FromJson(const QJsonValue& j, const QVector<QStrin
 
 // Object
 template<class T>
-inline T _FromJson(const QJsonValue& j, const T& _type) { return j.toObject(); }
-bool _FromJson(const QJsonValue& j, const bool& _type) { return j.toBool(); }
-int _FromJson(const QJsonValue& j, const int& _type) { return j.toInt(); }
-double _FromJson(const QJsonValue& j, const double& _type) { return j.toDouble(); }
-QString _FromJson(const QJsonValue& j, const QString& _type) { return j.toString(); }
+static inline T _FromJson(const QJsonValue& j, const T& _type) { return j.toObject(); }
+static inline bool _FromJson(const QJsonValue& j, const bool& _type) { return j.toBool(); }
+static inline int _FromJson(const QJsonValue& j, const int& _type) { return j.toInt(); }
+static inline double _FromJson(const QJsonValue& j, const double& _type) { return j.toDouble(); }
+static inline QString _FromJson(const QJsonValue& j, const QString& _type) { return j.toString(); }
 
 /****************************************************************************************************/
 /*                                           DEFINE                                                 */
 /****************************************************************************************************/
 #define _QSTR(s) #s
 
-inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remove(0, 1) : str; }
+static inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remove(0, 1) : str; }
 
 #define _QJSON_STR_KEY(KEY) _QJSON_KEY(QString(_QSTR(KEY)))
 
@@ -224,9 +227,9 @@ inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remo
 #define _QJSON_EXPAND_TO(KEY) \
     j[_QJSON_STR_KEY(KEY)] = _ToJson(KEY);
 
-#define _QJSON_ONLINE_CODE_BEGIN(CLASS) public: CLASS(const QJsonObject& j) { _fromJson(j); } CLASS(const QByteArray& s) { _fromJson(s); } CLASS(QFile& f) { _fromJson(f); } virtual void _fromJson(const QJsonObject& j) {
-#define _QJSON_ONLINE_CODE_PART } inline void _fromJson(const QByteArray& s) { _fromJson(QJsonDocument::fromJson(s).object()); } void _fromJson(QFile& f) { if (f.open(QIODevice::ReadOnly)) { _fromJson(f.readAll()); f.close(); } } virtual QJsonObject _toObject() const { QJsonObject j;
-#define _QJSON_ONLINE_CODE_END return j; } inline QByteArray _toJson(QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(_toObject()).toJson(format); } bool _toJson(QFile& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(_toJson(format)); f.flush(); f.close(); return true; } return false; }
+#define _QJSON_ONLINE_CODE_BEGIN(CLASS) CLASS(const QJsonObject& j) { fromJson(j); } CLASS(const QByteArray& s) { fromJson(s); } CLASS(QFile& f) { fromJson(f); } virtual void fromJson(const QJsonObject& j) {
+#define _QJSON_ONLINE_CODE_PART } inline void fromJson(const QByteArray& s) { fromJson(QJsonDocument::fromJson(s).object()); } void fromJson(QFile& f) { if (f.open(QIODevice::ReadOnly)) { fromJson(f.readAll()); f.close(); } } virtual QJsonObject toObject() const { QJsonObject j;
+#define _QJSON_ONLINE_CODE_END return j; } inline QByteArray toJson(QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toObject()).toJson(format); } bool toJson(QFile& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(toJson(format)); f.flush(); f.close(); return true; } return false; }
 
 #define _QJSON_ONLINE_1(CLASS) \
     _QJSON_ONLINE_CODE_BEGIN(CLASS) \
@@ -691,4 +694,6 @@ inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remo
 #define QJSON_ONLINE(...) _EXPAND(_PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, _COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__))
 #else
 #define QJSON_ONLINE(...) _PRIVATE_MACRO_CHOOSE_HELPER(_QJSON_ONLINE_, _COUNT_MACRO_VAR_ARGS( __VA_ARGS__))( __VA_ARGS__)
+#endif
+
 #endif
