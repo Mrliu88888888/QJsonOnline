@@ -17,7 +17,7 @@ QJsonArray _ToJson(const QList<T>& l)
 {
     QJsonArray j;
     for (const auto& v : l) {
-        j.append(v.toObject());
+        j.append(v.toJsonObject());
     }
     return j;
 }
@@ -32,7 +32,7 @@ QJsonArray _ToJson(const QVector<T>& v)
 {
     QJsonArray j;
     for (const auto& _v : v) {
-        j.append(_v.toObject());
+        j.append(_v.toJsonObject());
     }
     return j;
 }
@@ -43,7 +43,7 @@ template <> QJsonArray _ToJson(const QVector<QString>& v);
 
 // Object
 template<typename T>
-inline QJsonObject _ToJson(const T& v) { return v.toObject(); }
+inline QJsonObject _ToJson(const T& v) { return v.toJsonObject(); }
 inline bool _ToJson(const bool& b) { return b; }
 inline int _ToJson(const int& i) { return i; }
 inline double _ToJson(const double& d) { return d; }
@@ -75,7 +75,7 @@ QVector<T> _FromJson(const QJsonValue& j, const QVector<T>&)
     QVector<T> l;
     const auto& _j = j.toArray();
     for (const auto& v : _j) {
-        l.append(v.toObject());
+        l.append(v.toJsonObject());
     }
     return l;
 }
@@ -107,9 +107,23 @@ inline QString& _QJSON_KEY(QString&& str) { return (str.at(0) == '_') ? str.remo
 #define QJSON_EXPAND_TO(KEY) \
     j[TO_JSON_STR(KEY)] = _ToJson(KEY);
 
-#define QJSON_ONLINE_CODE_BEGIN(CLASS) CLASS(const QJsonObject& j) { fromJson(j); } CLASS(const QByteArray& s) { fromJson(s); } CLASS(QFile& f) { fromJson(f); } CLASS(QFile&& f) { fromJson(f); } void fromJson(const QJsonObject& j) {
-#define QJSON_ONLINE_CODE_PART } inline void fromJson(const QByteArray& s) { fromJson(QJsonDocument::fromJson(s).object()); } bool fromJson(QFile& f) { if (f.open(QIODevice::ReadOnly)) { fromJson(f.readAll()); f.close(); return true; } return false; } bool fromJson(QFile&& f) { if (f.open(QIODevice::ReadOnly)) { fromJson(f.readAll()); f.close(); return true; } return false; } QJsonObject toObject() const { QJsonObject j;
-#define QJSON_ONLINE_CODE_END return j; } inline QByteArray toJson(QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toObject()).toJson(format); } bool toJson(QFile& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(toJson(format)); f.flush(); f.close(); return true; } return false; } bool toJson(QFile&& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(toJson(format)); f.flush(); f.close(); return true; } return false; }
+#define QJSON_ONLINE_CODE_BEGIN(CLASS) \
+    CLASS(const QJsonObject& j) { fromJson(j); } \
+    CLASS(const QByteArray& s) { fromJson(s); } \
+    CLASS(QFile& f) { fromJson(f); } \
+    CLASS(QFile&& f) { fromJson(f); } \
+    void fromJson(const QJsonObject& j) {
+#define QJSON_ONLINE_CODE_PART \
+    } \
+    inline void fromJson(const QByteArray& s) { fromJson(QJsonDocument::fromJson(s).object()); } \
+    bool fromJson(QFile& f) { if (f.open(QIODevice::ReadOnly)) { fromJson(f.readAll()); f.close(); return true; } return false; } \
+    bool fromJson(QFile&& f) { if (f.open(QIODevice::ReadOnly)) { fromJson(f.readAll()); f.close(); return true; } return false; } \
+    QJsonObject toJsonObject() const { QJsonObject j;
+#define QJSON_ONLINE_CODE_END \
+    return j; } \
+    inline QByteArray toJson(QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(format); } \
+    bool toJson(QFile& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(toJson(format)); f.flush(); f.close(); return true; } return false; } \
+    bool toJson(QFile&& f, QJsonDocument::JsonFormat format = QJsonDocument::JsonFormat::Compact) const { if (f.open(QIODevice::WriteOnly)) { f.write(toJson(format)); f.flush(); f.close(); return true; } return false; }
 
 #define QJSON_ONLINE_1(CLASS) \
     QJSON_ONLINE_CODE_BEGIN(CLASS) \
