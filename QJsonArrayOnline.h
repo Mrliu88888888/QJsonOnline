@@ -1,6 +1,10 @@
 ﻿#pragma once
 #ifndef QJSON_ARRAY_ONLINE_H
 #define QJSON_ARRAY_ONLINE_H
+/****************************************************************************************************/
+/*                    https ://github.com/Mrliu88888888/QJsonOnline                                 */
+/****************************************************************************************************/
+
 #include "QJsonOnline.h"
 
 /****************************************************************************************************/
@@ -8,10 +12,6 @@
 /****************************************************************************************************/
 namespace lm
 {
-    /****************************************************************************************************/
-    /*                                           FROM JSON                                              */
-    /****************************************************************************************************/
-    // JsonArray[] -> QList
 #define QJSON_JSONARRAY_TO_LIST(TO) \
     { \
         r.clear(); \
@@ -20,15 +20,7 @@ namespace lm
         } \
         return r; \
     }
-    template<typename T>
-    QList<T>& FromJsonArray(const QJsonArray& j, QList<T>& r)
-        QJSON_JSONARRAY_TO_LIST(toObject);
-    template <> QList<bool>& FromJsonArray(const QJsonArray& j, QList<bool>& r);
-    template <> QList<int>& FromJsonArray(const QJsonArray& j, QList<int>& r);
-    template <> QList<double>& FromJsonArray(const QJsonArray& j, QList<double>& r);
-    template <> QList<QString>& FromJsonArray(const QJsonArray& j, QList<QString>& r);
 
-    // ByteArray -> JsonArray[]
 #define QJSON_BYTEARRAY_TO_LIST \
     { \
         r.clear(); \
@@ -39,15 +31,7 @@ namespace lm
         } \
         return r; \
     }
-    template<typename T>
-    QList<T>& FromJsonArray(const QByteArray& s, QList<T>& r)
-        QJSON_BYTEARRAY_TO_LIST;
-    template <> QList<bool>& FromJsonArray(const QByteArray& s, QList<bool>& r);
-    template <> QList<int>& FromJsonArray(const QByteArray& s, QList<int>& r);
-    template <> QList<double>& FromJsonArray(const QByteArray& s, QList<double>& r);
-    template <> QList<QString>& FromJsonArray(const QByteArray& s, QList<QString>& r);
 
-    // File -> ByteArray
 #define QJSON_FILE_TO_LIST \
     { \
         r.clear(); \
@@ -57,6 +41,47 @@ namespace lm
         } \
         return r; \
     }
+
+#define QJSON_JSONARRAY_TO_NLIST(T) \
+    { \
+        r.clear(); \
+        for (const auto& i : j) { \
+            T r2; \
+            r.append(FromJsonArray(i.toArray(), r2)); \
+        } \
+        return r; \
+    }
+
+#define QJSON_LIST_TO_FILE \
+    { \
+        if (f.open(QIODevice::WriteOnly)) { \
+            f.write(ToByteArray(v, fm)); \
+            f.flush(); \
+            f.close(); \
+            return true; \
+        } \
+        return false; \
+    }
+    /*************************************************FROM JSON*************************************************/
+    // QJsonArray -> QList[]
+    template<typename T>
+    QList<T>& FromJsonArray(const QJsonArray& j, QList<T>& r)
+        QJSON_JSONARRAY_TO_LIST(toObject);
+    template <> QList<bool>& FromJsonArray(const QJsonArray& j, QList<bool>& r);
+    template <> QList<int>& FromJsonArray(const QJsonArray& j, QList<int>& r);
+    template <> QList<double>& FromJsonArray(const QJsonArray& j, QList<double>& r);
+    template <> QList<QString>& FromJsonArray(const QJsonArray& j, QList<QString>& r);
+
+    // QByteArray -> QList[]
+    template<typename T>
+    QList<T>& FromJsonArray(const QByteArray& s, QList<T>& r)
+        QJSON_BYTEARRAY_TO_LIST;
+    template <> QList<bool>& FromJsonArray(const QByteArray& s, QList<bool>& r);
+    template <> QList<int>& FromJsonArray(const QByteArray& s, QList<int>& r);
+    template <> QList<double>& FromJsonArray(const QByteArray& s, QList<double>& r);
+    template <> QList<QString>& FromJsonArray(const QByteArray& s, QList<QString>& r);
+
+    // QFile -> QList[]
     template<typename T>
     QList<T>& FromJsonArray(QFile& f, QList<T>& r)
         QJSON_FILE_TO_LIST;
@@ -73,25 +98,16 @@ namespace lm
     template <> QList<double>& FromJsonArray(QFile&& f, QList<double>& r);
     template <> QList<QString>& FromJsonArray(QFile&& f, QList<QString>& r);
 
-    // JsonArray[][] -> QList
-#define QJSON_JSONARRAY_TO_LIST2(T) \
-    { \
-        r.clear(); \
-        for (const auto& i : j) { \
-            QList<T> r2; \
-            r.append(FromJsonArray(i.toArray(), r2)); \
-        } \
-        return r; \
-    }
+    // QJsonArray -> QList[][]
     template<typename T>
     QList<QList<T>>& FromJsonArray(const QJsonArray& j, QList<QList<T>>& r)
-        QJSON_JSONARRAY_TO_LIST2(T);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<T>>);
     template <> QList<QList<bool>>& FromJsonArray(const QJsonArray& j, QList<QList<bool>>& r);
     template <> QList<QList<int>>& FromJsonArray(const QJsonArray& j, QList<QList<int>>& r);
     template <> QList<QList<double>>& FromJsonArray(const QJsonArray& j, QList<QList<double>>& r);
     template <> QList<QList<QString>>& FromJsonArray(const QJsonArray& j, QList<QList<QString>>& r);
 
-    // ByteArray -> JsonArray[][]
+    // QByteArray -> QList[][]
     template<typename T>
     QList<QList<T>>& FromJsonArray(const QByteArray& s, QList<QList<T>>& r)
         QJSON_BYTEARRAY_TO_LIST;
@@ -100,7 +116,7 @@ namespace lm
     template <> QList<QList<double>>& FromJsonArray(const QByteArray& s, QList<QList<double>>& r);
     template <> QList<QList<QString>>& FromJsonArray(const QByteArray& s, QList<QList<QString>>& r);
 
-    // File -> ByteArray
+    // QFile -> QList[][]
     template<typename T>
     QList<QList<T>>& FromJsonArray(QFile& f, QList<QList<T>>& r)
         QJSON_FILE_TO_LIST;
@@ -117,25 +133,16 @@ namespace lm
     template <> QList<QList<double>>& FromJsonArray(QFile&& f, QList<QList<double>>& r);
     template <> QList<QList<QString>>& FromJsonArray(QFile&& f, QList<QList<QString>>& r);
 
-    // JsonArray[][][] -> QList
-#define QJSON_JSONARRAY_TO_LIST3(T) \
-    { \
-        r.clear(); \
-        for (const auto& i : j) { \
-            QList<QList<T>> r2; \
-            r.append(FromJsonArray(i.toArray(), r2)); \
-        } \
-        return r; \
-    }
+    // QJsonArray -> QList[][][]
     template<typename T>
     QList<QList<QList<T>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<T>>>& r)
-        QJSON_JSONARRAY_TO_LIST3(T);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QList<T>>>);
     template <> QList<QList<QList<bool>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<bool>>>& r);
     template <> QList<QList<QList<int>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<int>>>& r);
     template <> QList<QList<QList<double>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<double>>>& r);
     template <> QList<QList<QList<QString>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<QString>>>& r);
 
-    // ByteArray -> JsonArray[][][]
+    // QByteArray -> QList[][][]
     template<typename T>
     QList<QList<QList<T>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<T>>>& r)
         QJSON_BYTEARRAY_TO_LIST;
@@ -144,7 +151,7 @@ namespace lm
     template <> QList<QList<QList<double>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<double>>>& r);
     template <> QList<QList<QList<QString>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<QString>>>& r);
 
-    // File -> ByteArray
+    // QFile -> QList[][][]
     template<typename T>
     QList<QList<QList<T>>>& FromJsonArray(QFile& f, QList<QList<QList<T>>>& r)
         QJSON_FILE_TO_LIST;
@@ -161,152 +168,64 @@ namespace lm
     template <> QList<QList<QList<double>>>& FromJsonArray(QFile&& f, QList<QList<QList<double>>>& r);
     template <> QList<QList<QList<QString>>>& FromJsonArray(QFile&& f, QList<QList<QList<QString>>>& r);
 
-    /****************************************************************************************************/
-    /*                                           TO JSON                                                */
-    /****************************************************************************************************/
-    // QList[] -> JsonArray
-#define QJSON_LIST_TO_JSONARRAY(TO) \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(TO); \
-        } \
-        return r; \
-    }
+    /*************************************************TO JSON*************************************************/
+    // QList[] -> QJsonArray
     template<typename T>
-    QJsonArray ToJsonArray(const QList<T>& v)
-        QJSON_LIST_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray ToJsonArray(const QList<bool>& v);
-    template <> QJsonArray ToJsonArray(const QList<int>& v);
-    template <> QJsonArray ToJsonArray(const QList<double>& v);
-    template <> QJsonArray ToJsonArray(const QList<QString>& v);
+    inline QJsonArray ToJsonArray(const QList<T>& v) { return _lm::toJson(v); }
 
-    // QList[] -> ByteArray
+    // QList[] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QList<T>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QList[] -> File
+    // QList[] -> QFile
     template<typename T>
-    inline bool ToFile(const QList<T>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
-    template<typename T>
-    inline bool ToFile(const QList<T>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QList<T>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
 
-    // QList[][] -> JsonArray
-#define QJSON_LIST2_TO_JSONARRAY \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(ToJsonArray(i)); \
-        } \
-        return r; \
-    }
     template<typename T>
-    QJsonArray ToJsonArray(const QList<QList<T>>& v)
-        QJSON_LIST2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<bool>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<int>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<double>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<QString>>& v);
+    bool ToFile(const QList<T>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
 
-    // QList[][] -> ByteArray
+    // QList[][] -> QJsonArray
+    template<typename T>
+    inline QJsonArray ToJsonArray(const QList<QList<T>>& v) { return _lm::toJson(v); }
+
+    // QList[][] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QList<QList<T>>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QList[][] -> File
+    // QList[][] -> QFile
     template<typename T>
-    inline bool ToFile(const QList<QList<T>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QList<QList<T>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
     template<typename T>
-    inline bool ToFile(const QList<QList<T>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QList<QList<T>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
 
-    // QList[][][] -> JsonArray
-#define QJSON_LIST3_TO_JSONARRAY \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(ToJsonArray(i)); \
-        } \
-        return r; \
-    }
+    // QList[][][] -> QJsonArray
     template<typename T>
-    QJsonArray ToJsonArray(const QList<QList<QList<T>>>& v)
-        QJSON_LIST3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<bool>>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<int>>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<double>>>& v);
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<QString>>>& v);
+    inline QJsonArray ToJsonArray(const QList<QList<QList<T>>>& v) { return _lm::toJson(v); }
 
-    // QList[][][] -> ByteArray
+    // QList[][][] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QList<QList<QList<T>>>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QList[][][] -> File
+    // QList[][][] -> QFile
     template<typename T>
-    inline bool ToFile(const QList<QList<QList<T>>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QList<QList<QList<T>>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
     template<typename T>
-    inline bool ToFile(const QList<QList<QList<T>>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QList<QList<QList<T>>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_LIST_TO_FILE;
 }
 
 /****************************************************************************************************/
@@ -314,18 +233,13 @@ namespace lm
 /****************************************************************************************************/
 namespace lm
 {
-    /****************************************************************************************************/
-    /*                                           FROM JSON                                              */
-    /****************************************************************************************************/
-    // JsonArray[] -> QVector
-#define QJSON_JSONARRAY_TO_VECTOR(TO) \
-    { \
-        r.clear(); \
-        for (const auto& i : j) {  \
-            r.append(i.TO()); \
-        } \
-        return r; \
-    }
+#define QJSON_JSONARRAY_TO_VECTOR(TO) QJSON_JSONARRAY_TO_LIST(TO)
+#define QJSON_BYTEARRAY_TO_VECTOR QJSON_BYTEARRAY_TO_LIST
+#define QJSON_FILE_TO_VECTOR QJSON_FILE_TO_LIST
+#define QJSON_JSONARRAY_TO_NVECTOR(T) QJSON_JSONARRAY_TO_NLIST(T)
+#define QJSON_VECTOR_TO_FILE QJSON_LIST_TO_FILE
+    /*************************************************FROM JSON*************************************************/
+    // QJsonArray -> QVector[]
     template<typename T>
     QVector<T>& FromJsonArray(const QJsonArray& j, QVector<T>& r)
         QJSON_JSONARRAY_TO_VECTOR(toObject);
@@ -334,17 +248,7 @@ namespace lm
     template <> QVector<double>& FromJsonArray(const QJsonArray& j, QVector<double>& r);
     template <> QVector<QString>& FromJsonArray(const QJsonArray& j, QVector<QString>& r);
 
-    // ByteArray -> JsonArray[]
-#define QJSON_BYTEARRAY_TO_VECTOR \
-    { \
-        r.clear(); \
-        auto d = QJsonDocument::fromJson(s); \
-        if (d.isNull()) { return r; } \
-        if (d.isArray()) { \
-            r = FromJsonArray(d.array(), r); \
-        } \
-        return r; \
-    }
+    // QByteArray -> QVector[]
     template<typename T>
     QVector<T>& FromJsonArray(const QByteArray& s, QVector<T>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
@@ -353,16 +257,7 @@ namespace lm
     template <> QVector<double>& FromJsonArray(const QByteArray& s, QVector<double>& r);
     template <> QVector<QString>& FromJsonArray(const QByteArray& s, QVector<QString>& r);
 
-    // File -> ByteArray
-#define QJSON_FILE_TO_VECTOR \
-    { \
-        r.clear(); \
-        if (f.open(QIODevice::ReadOnly)) { \
-            r = FromJsonArray(f.readAll(), r); \
-            f.close(); \
-        } \
-        return r; \
-    }
+    // QFile -> QVector[]
     template<typename T>
     QVector<T>& FromJsonArray(QFile& f, QVector<T>& r)
         QJSON_FILE_TO_VECTOR;
@@ -379,25 +274,16 @@ namespace lm
     template <> QVector<double>& FromJsonArray(QFile&& f, QVector<double>& r);
     template <> QVector<QString>& FromJsonArray(QFile&& f, QVector<QString>& r);
 
-    // JsonArray[][] -> QVector
-#define QJSON_JSONARRAY_TO_VECTOR2(T) \
-    { \
-        r.clear(); \
-        for (const auto& i : j) { \
-            QVector<T> r2; \
-            r.append(FromJsonArray(i.toArray(), r2)); \
-        } \
-        return r; \
-    }
+    // QJsonArray -> QVector[][]
     template<typename T>
     QVector<QVector<T>>& FromJsonArray(const QJsonArray& j, QVector<QVector<T>>& r)
-        QJSON_JSONARRAY_TO_VECTOR2(T);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<T>>);
     template <> QVector<QVector<bool>>& FromJsonArray(const QJsonArray& j, QVector<QVector<bool>>& r);
     template <> QVector<QVector<int>>& FromJsonArray(const QJsonArray& j, QVector<QVector<int>>& r);
     template <> QVector<QVector<double>>& FromJsonArray(const QJsonArray& j, QVector<QVector<double>>& r);
     template <> QVector<QVector<QString>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QString>>& r);
 
-    // ByteArray -> JsonArray[][]
+    // QByteArray -> QVector[][]
     template<typename T>
     QVector<QVector<T>>& FromJsonArray(const QByteArray& s, QVector<QVector<T>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
@@ -406,7 +292,7 @@ namespace lm
     template <> QVector<QVector<double>>& FromJsonArray(const QByteArray& s, QVector<QVector<double>>& r);
     template <> QVector<QVector<QString>>& FromJsonArray(const QByteArray& s, QVector<QVector<QString>>& r);
 
-    // File -> ByteArray
+    // QFile -> QVector[][]
     template<typename T>
     QVector<QVector<T>>& FromJsonArray(QFile& f, QVector<QVector<T>>& r)
         QJSON_FILE_TO_VECTOR;
@@ -423,25 +309,16 @@ namespace lm
     template <> QVector<QVector<double>>& FromJsonArray(QFile&& f, QVector<QVector<double>>& r);
     template <> QVector<QVector<QString>>& FromJsonArray(QFile&& f, QVector<QVector<QString>>& r);
 
-    // JsonArray[][][] -> QVector
-#define QJSON_JSONARRAY_TO_VECTOR3(T) \
-    { \
-        r.clear(); \
-        for (const auto& i : j) { \
-            QVector<QVector<T>> r2; \
-            r.append(FromJsonArray(i.toArray(), r2)); \
-        } \
-        return r; \
-    }
+    // QJsonArray -> QVector[][][]
     template<typename T>
     QVector<QVector<QVector<T>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<T>>>& r)
-        QJSON_JSONARRAY_TO_VECTOR3(T);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QVector<T>>>);
     template <> QVector<QVector<QVector<bool>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<bool>>>& r);
     template <> QVector<QVector<QVector<int>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<int>>>& r);
     template <> QVector<QVector<QVector<double>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<double>>>& r);
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<QString>>>& r);
 
-    // ByteArray -> JsonArray[][][]
+    // QByteArray -> QVector[][][]
     template<typename T>
     QVector<QVector<QVector<T>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<T>>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
@@ -450,7 +327,7 @@ namespace lm
     template <> QVector<QVector<QVector<double>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<double>>>& r);
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<QString>>>& r);
 
-    // File -> ByteArray
+    // QFile -> QVector[][][]
     template<typename T>
     QVector<QVector<QVector<T>>>& FromJsonArray(QFile& f, QVector<QVector<QVector<T>>>& r)
         QJSON_FILE_TO_VECTOR;
@@ -467,151 +344,62 @@ namespace lm
     template <> QVector<QVector<QVector<double>>>& FromJsonArray(QFile&& f, QVector<QVector<QVector<double>>>& r);
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(QFile&& f, QVector<QVector<QVector<QString>>>& r);
 
-    /****************************************************************************************************/
-    /*                                           TO JSON                                                */
-    /****************************************************************************************************/
-    // QVector[] -> JsonArray
-#define QJSON_VECTOR_TO_JSONARRAY(TO) \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(TO); \
-        } \
-        return r; \
-    }
+    /*************************************************TO JSON*************************************************/
+    // QVector[] -> QJsonArray
     template<typename T>
-    QJsonArray ToJsonArray(const QVector<T>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray ToJsonArray(const QVector<bool>& v);
-    template <> QJsonArray ToJsonArray(const QVector<int>& v);
-    template <> QJsonArray ToJsonArray(const QVector<double>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QString>& v);
+    inline QJsonArray ToJsonArray(const QVector<T>& v) { return _lm::toJson(v); }
 
-    // QVector[] -> ByteArray
+    // QVector[] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QVector<T>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QVector[] -> File
+    // QVector[] -> QFile
     template<typename T>
-    inline bool ToFile(const QVector<T>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<T>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
     template<typename T>
-    inline bool ToFile(const QVector<T>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<T>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
 
-    // QVector[][] -> JsonArray
-#define QJSON_VECTOR2_TO_JSONARRAY \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(ToJsonArray(i)); \
-        } \
-        return r; \
-    }
+    // QVector[][] -> QJsonArray
     template<typename T>
-    QJsonArray ToJsonArray(const QVector<QVector<T>>& v)
-        QJSON_VECTOR2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<bool>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<int>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<double>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QString>>& v);
+    inline QJsonArray ToJsonArray(const QVector<QVector<T>>& v) { return _lm::toJson(v); }
 
-    // QVector[][] -> ByteArray
+    // QVector[][] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QVector<QVector<T>>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QVector[][] -> File
+    // QVector[][] -> QFile
     template<typename T>
-    inline bool ToFile(const QVector<QVector<T>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<QVector<T>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
     template<typename T>
-    inline bool ToFile(const QVector<QVector<T>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<QVector<T>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
 
-    // QVector[][][] -> JsonArray
-#define QJSON_VECTOR3_TO_JSONARRAY \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(ToJsonArray(i)); \
-        } \
-        return r; \
-    }
+    // QVector[][][] -> QJsonArray
     template<typename T>
-    QJsonArray ToJsonArray(const QVector<QVector<QVector<T>>>& v)
-        QJSON_VECTOR3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<bool>>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<int>>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<double>>>& v);
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<QString>>>& v);
+    inline QJsonArray ToJsonArray(const QVector<QVector<QVector<T>>>& v) { return _lm::toJson(v); }
 
-    // QVector[][][] -> ByteArray
+    // QVector[][][] -> QByteArray
     template<typename T>
     inline QByteArray ToByteArray(const QVector<QVector<QVector<T>>>& v, QJsonDocument::JsonFormat f = QJsonDocument::JsonFormat::Compact)
     {
         return QJsonDocument(ToJsonArray(v)).toJson(f);
     }
 
-    // QVector[][][] -> File
+    // QVector[][][] -> QFile
     template<typename T>
-    inline bool ToFile(const QVector<QVector<QVector<T>>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<QVector<QVector<T>>>& v, QFile& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
     template<typename T>
-    inline bool ToFile(const QVector<QVector<QVector<T>>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
-    {
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(ToByteArray(v, fm));
-            f.flush();
-            f.close();
-            return true;
-        }
-        return false;
-    }
+    bool ToFile(const QVector<QVector<QVector<T>>>& v, QFile&& f, QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact)
+        QJSON_VECTOR_TO_FILE;
 }
 #endif

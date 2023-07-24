@@ -2,66 +2,55 @@
 #include <qvector.h>
 
 /****************************************************************************************************/
-/*                                           FROM JSON                                              */
+/*                                           LIST                                                   */
 /****************************************************************************************************/
-// Array[] -> QList
-#define QJSON_JSONVALUE_TO_LIST(TO) \
-    { \
-        r.clear(); \
-        const auto& t = j.toArray(); \
-        for (const auto& i : t) { \
-            r.append(i.TO()); \
-        } \
-        return r; \
-    }
-template <> QList<bool>& _FromJson(const QJsonValue& j, QList<bool>& r)
-QJSON_JSONVALUE_TO_LIST(toBool)
-template <> QList<int>& _FromJson(const QJsonValue& j, QList<int>& r)
-QJSON_JSONVALUE_TO_LIST(toInt)
-template <> QList<double>& _FromJson(const QJsonValue& j, QList<double>& r)
-QJSON_JSONVALUE_TO_LIST(toDouble)
-template <> QList<QString>& _FromJson(const QJsonValue& j, QList<QString>& r)
-QJSON_JSONVALUE_TO_LIST(toString)
+namespace _lm {
+    /*************************************************FROM JSON*************************************************/
+    // QJsonValue -> QList[]
+    template <> QList<bool>& fromJson(const QJsonValue& j, QList<bool>& r)
+        QJSON_JSONVALUE_TO_LIST(toBool);
+    template <> QList<int>& fromJson(const QJsonValue& j, QList<int>& r)
+        QJSON_JSONVALUE_TO_LIST(toInt);
+    template <> QList<double>& fromJson(const QJsonValue& j, QList<double>& r)
+        QJSON_JSONVALUE_TO_LIST(toDouble);
+    template <> QList<QString>& fromJson(const QJsonValue& j, QList<QString>& r)
+        QJSON_JSONVALUE_TO_LIST(toString);
 
-// Array[] -> QVector
-#define QJSON_JSONVALUE_TO_VECTOR(TO) QJSON_JSONVALUE_TO_LIST(TO)
-template <> QVector<bool>& _FromJson(const QJsonValue& j, QVector<bool>& r)
-QJSON_JSONVALUE_TO_VECTOR(toBool)
-template <> QVector<int>& _FromJson(const QJsonValue& j, QVector<int>& r)
-QJSON_JSONVALUE_TO_VECTOR(toInt)
-template <> QVector<double>& _FromJson(const QJsonValue& j, QVector<double>& r)
-QJSON_JSONVALUE_TO_VECTOR(toDouble)
-template <> QVector<QString>& _FromJson(const QJsonValue& j, QVector<QString>& r)
-QJSON_JSONVALUE_TO_VECTOR(toString)
+    /*************************************************TO JSON*************************************************/
+    // QList[] -> QJsonArray
+    template <> QJsonArray toJson(const QList<bool>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<int>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<double>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<QString>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+}
 
 /****************************************************************************************************/
-/*                                           TO JSON                                                */
+/*                                           VECTOR                                                 */
 /****************************************************************************************************/
-// Array[] -> QList
-#define QJSON_LIST_TO_JSONARRAY \
-    { \
-        QJsonArray r; \
-        for (const auto& i : v) { \
-            r.append(i); \
-        } \
-        return r; \
-    }
-template <> QJsonArray _ToJson(const QList<bool>& v)
-QJSON_LIST_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QList<int>& v)
-QJSON_LIST_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QList<double>& v)
-QJSON_LIST_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QList<QString>& v)
-QJSON_LIST_TO_JSONARRAY
+namespace _lm {
+    /*************************************************FROM JSON*************************************************/
+    // QJsonValue -> QVector[]
+    template <> QVector<bool>& fromJson(const QJsonValue& j, QVector<bool>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toBool);
+    template <> QVector<int>& fromJson(const QJsonValue& j, QVector<int>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toInt);
+    template <> QVector<double>& fromJson(const QJsonValue& j, QVector<double>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toDouble);
+    template <> QVector<QString>& fromJson(const QJsonValue& j, QVector<QString>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toString);
 
-// Array[] -> QVector
-#define QJSON_VECTOR_TO_JSONARRAY QJSON_LIST_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QVector<bool>& v)
-QJSON_VECTOR_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QVector<int>& v)
-QJSON_VECTOR_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QVector<double>& v)
-QJSON_VECTOR_TO_JSONARRAY
-template <> QJsonArray _ToJson(const QVector<QString>& v)
-QJSON_VECTOR_TO_JSONARRAY
+    /*************************************************TO JSON*************************************************/
+    // QVector[] -> QJsonArray
+    template <> QJsonArray toJson(const QVector<bool>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<int>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<double>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<QString>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+}

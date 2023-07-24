@@ -4,9 +4,7 @@
 /*                                           LIST                                                   */
 /****************************************************************************************************/
 namespace lm {
-    /****************************************************************************************************/
-    /*                                           FROM JSON                                              */
-    /****************************************************************************************************/
+    /*************************************************FROM JSON*************************************************/
     template <> QList<bool>& FromJsonArray(const QJsonArray& j, QList<bool>& r)
         QJSON_JSONARRAY_TO_LIST(toBool);
     template <> QList<int>& FromJsonArray(const QJsonArray& j, QList<int>& r)
@@ -43,17 +41,15 @@ namespace lm {
     template <> QList<QString>& FromJsonArray(QFile&& f, QList<QString>& r)
         QJSON_FILE_TO_LIST;
 
-    // JsonArray[][] -> QList
     template <> QList<QList<bool>>& FromJsonArray(const QJsonArray& j, QList<QList<bool>>& r)
-        QJSON_JSONARRAY_TO_LIST2(bool);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<bool>>);
     template <> QList<QList<int>>& FromJsonArray(const QJsonArray& j, QList<QList<int>>& r)
-        QJSON_JSONARRAY_TO_LIST2(int);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<int>>);
     template <> QList<QList<double>>& FromJsonArray(const QJsonArray& j, QList<QList<double>>& r)
-        QJSON_JSONARRAY_TO_LIST2(double);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<double>>);
     template <> QList<QList<QString>>& FromJsonArray(const QJsonArray& j, QList<QList<QString>>& r)
-        QJSON_JSONARRAY_TO_LIST2(QString);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QString>>);
 
-    // ByteArray -> JsonArray[][]
     template <> QList<QList<bool>>& FromJsonArray(const QByteArray& s, QList<QList<bool>>& r)
         QJSON_BYTEARRAY_TO_LIST;
     template <> QList<QList<int>>& FromJsonArray(const QByteArray& s, QList<QList<int>>& r)
@@ -63,7 +59,6 @@ namespace lm {
     template <> QList<QList<QString>>& FromJsonArray(const QByteArray& s, QList<QList<QString>>& r)
         QJSON_BYTEARRAY_TO_LIST;
 
-    // File -> ByteArray
     template <> QList<QList<bool>>& FromJsonArray(QFile& f, QList<QList<bool>>& r)
         QJSON_FILE_TO_LIST;
     template <> QList<QList<int>>& FromJsonArray(QFile& f, QList<QList<int>>& r)
@@ -82,17 +77,15 @@ namespace lm {
     template <> QList<QList<QString>>& FromJsonArray(QFile&& f, QList<QList<QString>>& r)
         QJSON_FILE_TO_LIST;
 
-    // JsonArray[][][] -> QList
     template <> QList<QList<QList<bool>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<bool>>>& r)
-        QJSON_JSONARRAY_TO_LIST3(bool);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QList<bool>>>);
     template <> QList<QList<QList<int>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<int>>>& r)
-        QJSON_JSONARRAY_TO_LIST3(int);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QList<int>>>);
     template <> QList<QList<QList<double>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<double>>>& r)
-        QJSON_JSONARRAY_TO_LIST3(double);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QList<double>>>);
     template <> QList<QList<QList<QString>>>& FromJsonArray(const QJsonArray& j, QList<QList<QList<QString>>>& r)
-        QJSON_JSONARRAY_TO_LIST3(QString);
+        QJSON_JSONARRAY_TO_NLIST(QList<QList<QList<QString>>>);
 
-    // ByteArray -> JsonArray[][][]
     template <> QList<QList<QList<bool>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<bool>>>& r)
         QJSON_BYTEARRAY_TO_LIST;
     template <> QList<QList<QList<int>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<int>>>& r)
@@ -102,7 +95,6 @@ namespace lm {
     template <> QList<QList<QList<QString>>>& FromJsonArray(const QByteArray& s, QList<QList<QList<QString>>>& r)
         QJSON_BYTEARRAY_TO_LIST;
 
-    // File -> ByteArray
     template <> QList<QList<QList<bool>>>& FromJsonArray(QFile& f, QList<QList<QList<bool>>>& r)
         QJSON_FILE_TO_LIST;
     template <> QList<QList<QList<int>>>& FromJsonArray(QFile& f, QList<QList<QList<int>>>& r)
@@ -120,39 +112,6 @@ namespace lm {
         QJSON_FILE_TO_LIST;
     template <> QList<QList<QList<QString>>>& FromJsonArray(QFile&& f, QList<QList<QList<QString>>>& r)
         QJSON_FILE_TO_LIST;
-
-    /****************************************************************************************************/
-    /*                                           TO JSON                                                */
-    /****************************************************************************************************/
-    // QList -> JsonArray[]
-    template <> QJsonArray ToJsonArray(const QList<bool>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QList<int>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QList<double>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QList<QString>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-
-    // QList[][]->JsonArray
-    template <> QJsonArray ToJsonArray(const QList<QList<bool>>& v)
-        QJSON_LIST2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<int>>& v)
-        QJSON_LIST2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<double>>& v)
-        QJSON_LIST2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<QString>>& v)
-        QJSON_LIST2_TO_JSONARRAY;
-
-    // QList[][][] -> JsonArray
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<bool>>>& v)
-        QJSON_LIST3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<int>>>& v)
-        QJSON_LIST3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<double>>>& v)
-        QJSON_LIST3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QList<QList<QList<QString>>>& v)
-        QJSON_LIST3_TO_JSONARRAY;
 }
 
 /****************************************************************************************************/
@@ -160,9 +119,7 @@ namespace lm {
 /****************************************************************************************************/
 #include <qvector.h>
 namespace lm {
-    /****************************************************************************************************/
-    /*                                           FROM JSON                                              */
-    /****************************************************************************************************/
+    /*************************************************FROM JSON*************************************************/
     template <> QVector<bool>& FromJsonArray(const QJsonArray& j, QVector<bool>& r)
         QJSON_JSONARRAY_TO_VECTOR(toBool);
     template <> QVector<int>& FromJsonArray(const QJsonArray& j, QVector<int>& r)
@@ -199,17 +156,15 @@ namespace lm {
     template <> QVector<QString>& FromJsonArray(QFile&& f, QVector<QString>& r)
         QJSON_FILE_TO_VECTOR;
 
-    // JsonArray[][] -> QVector
     template <> QVector<QVector<bool>>& FromJsonArray(const QJsonArray& j, QVector<QVector<bool>>& r)
-        QJSON_JSONARRAY_TO_VECTOR2(bool);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<bool>>);
     template <> QVector<QVector<int>>& FromJsonArray(const QJsonArray& j, QVector<QVector<int>>& r)
-        QJSON_JSONARRAY_TO_VECTOR2(int);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<int>>);
     template <> QVector<QVector<double>>& FromJsonArray(const QJsonArray& j, QVector<QVector<double>>& r)
-        QJSON_JSONARRAY_TO_VECTOR2(double);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<double>>);
     template <> QVector<QVector<QString>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QString>>& r)
-        QJSON_JSONARRAY_TO_VECTOR2(QString);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QString>>);
 
-    // ByteArray -> JsonArray[][]
     template <> QVector<QVector<bool>>& FromJsonArray(const QByteArray& s, QVector<QVector<bool>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
     template <> QVector<QVector<int>>& FromJsonArray(const QByteArray& s, QVector<QVector<int>>& r)
@@ -219,7 +174,6 @@ namespace lm {
     template <> QVector<QVector<QString>>& FromJsonArray(const QByteArray& s, QVector<QVector<QString>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
 
-    // File -> ByteArray
     template <> QVector<QVector<bool>>& FromJsonArray(QFile& f, QVector<QVector<bool>>& r)
         QJSON_FILE_TO_VECTOR;
     template <> QVector<QVector<int>>& FromJsonArray(QFile& f, QVector<QVector<int>>& r)
@@ -238,17 +192,15 @@ namespace lm {
     template <> QVector<QVector<QString>>& FromJsonArray(QFile&& f, QVector<QVector<QString>>& r)
         QJSON_FILE_TO_VECTOR;
 
-    // JsonArray[][][] -> QVector
     template <> QVector<QVector<QVector<bool>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<bool>>>& r)
-        QJSON_JSONARRAY_TO_VECTOR3(bool);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QVector<bool>>>);
     template <> QVector<QVector<QVector<int>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<int>>>& r)
-        QJSON_JSONARRAY_TO_VECTOR3(int);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QVector<int>>>);
     template <> QVector<QVector<QVector<double>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<double>>>& r)
-        QJSON_JSONARRAY_TO_VECTOR3(double);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QVector<double>>>);
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(const QJsonArray& j, QVector<QVector<QVector<QString>>>& r)
-        QJSON_JSONARRAY_TO_VECTOR3(QString);
+        QJSON_JSONARRAY_TO_NVECTOR(QVector<QVector<QVector<QString>>>);
 
-    // ByteArray -> JsonArray[][][]
     template <> QVector<QVector<QVector<bool>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<bool>>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
     template <> QVector<QVector<QVector<int>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<int>>>& r)
@@ -258,7 +210,6 @@ namespace lm {
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(const QByteArray& s, QVector<QVector<QVector<QString>>>& r)
         QJSON_BYTEARRAY_TO_VECTOR;
 
-    // File -> ByteArray
     template <> QVector<QVector<QVector<bool>>>& FromJsonArray(QFile& f, QVector<QVector<QVector<bool>>>& r)
         QJSON_FILE_TO_VECTOR;
     template <> QVector<QVector<QVector<int>>>& FromJsonArray(QFile& f, QVector<QVector<QVector<int>>>& r)
@@ -276,37 +227,4 @@ namespace lm {
         QJSON_FILE_TO_VECTOR;
     template <> QVector<QVector<QVector<QString>>>& FromJsonArray(QFile&& f, QVector<QVector<QVector<QString>>>& r)
         QJSON_FILE_TO_VECTOR;
-
-    /****************************************************************************************************/
-    /*                                           TO JSON                                                */
-    /****************************************************************************************************/
-    // QVector -> JsonArray[]
-    template <> QJsonArray ToJsonArray(const QVector<bool>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QVector<int>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QVector<double>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray ToJsonArray(const QVector<QString>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-
-    // QVector[][]->JsonArray
-    template <> QJsonArray ToJsonArray(const QVector<QVector<bool>>& v)
-        QJSON_VECTOR2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<int>>& v)
-        QJSON_VECTOR2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<double>>& v)
-        QJSON_VECTOR2_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QString>>& v)
-        QJSON_VECTOR2_TO_JSONARRAY;
-
-    // QVector[][][] -> JsonArray
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<bool>>>& v)
-        QJSON_VECTOR3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<int>>>& v)
-        QJSON_VECTOR3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<double>>>& v)
-        QJSON_VECTOR3_TO_JSONARRAY;
-    template <> QJsonArray ToJsonArray(const QVector<QVector<QVector<QString>>>& v)
-        QJSON_VECTOR3_TO_JSONARRAY;
 }
