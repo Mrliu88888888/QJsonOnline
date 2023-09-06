@@ -9,6 +9,8 @@
 #include <qjsonobject.h>
 #include <qjsonarray.h>
 #include <qfile.h>
+#include <qlist.h>
+#include <qvector.h>
 
 /****************************************************************************************************/
 /*                                           OBJECT                                                 */
@@ -67,10 +69,14 @@ namespace _lm {
     template<typename T>
     QList<T>& fromJson(const QJsonValue& j, QList<T>& r)
         QJSON_JSONVALUE_TO_LIST(toObject);
-    template <> QList<bool>& fromJson(const QJsonValue& j, QList<bool>& r);
-    template <> QList<int>& fromJson(const QJsonValue& j, QList<int>& r);
-    template <> QList<double>& fromJson(const QJsonValue& j, QList<double>& r);
-    template <> QList<QString>& fromJson(const QJsonValue& j, QList<QString>& r);
+    template <> QList<bool>& fromJson(const QJsonValue& j, QList<bool>& r)
+        QJSON_JSONVALUE_TO_LIST(toBool);
+    template <> QList<int>& fromJson(const QJsonValue& j, QList<int>& r)
+        QJSON_JSONVALUE_TO_LIST(toInt);
+    template <> QList<double>& fromJson(const QJsonValue& j, QList<double>& r)
+        QJSON_JSONVALUE_TO_LIST(toDouble);
+    template <> QList<QString>& fromJson(const QJsonValue& j, QList<QString>& r)
+        QJSON_JSONVALUE_TO_LIST(toString);
 
     // QJsonValue -> QList[][]
     template<typename T>
@@ -87,10 +93,14 @@ namespace _lm {
     template<typename T>
     QJsonArray toJson(const QList<T>& v)
         QJSON_LIST_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray toJson(const QList<bool>& v);
-    template <> QJsonArray toJson(const QList<int>& v);
-    template <> QJsonArray toJson(const QList<double>& v);
-    template <> QJsonArray toJson(const QList<QString>& v);
+    template <> QJsonArray toJson(const QList<bool>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<int>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<double>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QList<QString>& v)
+        QJSON_LIST_TO_JSONARRAY(i);
 
     // QList[][] -> QJsonArray
     template<typename T>
@@ -115,10 +125,14 @@ namespace _lm {
     template<typename T>
     QVector<T>& fromJson(const QJsonValue& j, QVector<T>& r)
         QJSON_JSONVALUE_TO_VECTOR(toObject);
-    template <> QVector<bool>& fromJson(const QJsonValue& j, QVector<bool>& r);
-    template <> QVector<int>& fromJson(const QJsonValue& j, QVector<int>& r);
-    template <> QVector<double>& fromJson(const QJsonValue& j, QVector<double>& r);
-    template <> QVector<QString>& fromJson(const QJsonValue& j, QVector<QString>& r);
+    template <> QVector<bool>& fromJson(const QJsonValue& j, QVector<bool>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toBool);
+    template <> QVector<int>& fromJson(const QJsonValue& j, QVector<int>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toInt);
+    template <> QVector<double>& fromJson(const QJsonValue& j, QVector<double>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toDouble);
+    template <> QVector<QString>& fromJson(const QJsonValue& j, QVector<QString>& r)
+        QJSON_JSONVALUE_TO_VECTOR(toString);
 
     // QJsonValue -> QVector[][]
     template<typename T>
@@ -135,10 +149,14 @@ namespace _lm {
     template<typename T>
     QJsonArray toJson(const QVector<T>& v)
         QJSON_LIST_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray toJson(const QVector<bool>& v);
-    template <> QJsonArray toJson(const QVector<int>& v);
-    template <> QJsonArray toJson(const QVector<double>& v);
-    template <> QJsonArray toJson(const QVector<QString>& v);
+    template <> QJsonArray toJson(const QVector<bool>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<int>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<double>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
+    template <> QJsonArray toJson(const QVector<QString>& v)
+        QJSON_VECTOR_TO_JSONARRAY(i);
 
     // QVector[][] -> QJsonArray
     template<typename T>
@@ -174,12 +192,14 @@ namespace _lm {
 #define QJSON_ONLINE_CODE_BEGIN(CLASS) \
     CLASS(const QJsonObject& __j) { fromJson(__j); } \
     CLASS(const QByteArray& __s) { fromJson(__s); } \
+    CLASS(const QString& __s) { fromJson(__s); } \
     CLASS(QFile& __f) { fromJson(__f); } \
     CLASS(QFile&& __f) { fromJson(__f); } \
     void fromJson(const QJsonObject& __j) {
 #define QJSON_ONLINE_CODE_PART \
     } \
     void fromJson(const QByteArray& __s) { auto __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return; } if (__d.isObject()) { fromJson(__d.object()); } } \
+    inline void fromJson(const QString& __s) { return fromJson(__s.toUtf8()); } \
     bool fromJson(QFile& __f) { if (__f.open(QIODevice::ReadOnly)) { fromJson(__f.readAll()); __f.close(); return true; } return false; } \
     bool fromJson(QFile&& __f) { if (__f.open(QIODevice::ReadOnly)) { fromJson(__f.readAll()); __f.close(); return true; } return false; } \
     QJsonObject toJsonObject() const { QJsonObject __j;
