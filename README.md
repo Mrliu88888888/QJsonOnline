@@ -10,6 +10,7 @@
 3. 如需解析json数组，请使用 QJsonArrayOnline.h
 
 # 帮助和注意
+```
 代码中使用 QJSON_ONLINE 宏函数将代码入侵到struct/class内
 使用格式如下:
   QJSON_ONLINE(ClassName, MemberName, MemberName...)
@@ -25,7 +26,8 @@
         1: QJsonDocument为空
         2: QJsonDocument类型不为对象
         3: 打开文件失败
-        
+```
+
 # 示例
 ```
 {
