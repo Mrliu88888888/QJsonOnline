@@ -1,20 +1,42 @@
 ﻿#pragma once
 #ifndef QJSON_ONLINE_H
 #define QJSON_ONLINE_H
+
 /****************************************************************************************************/
 /*                    https ://github.com/Mrliu88888888/QJsonOnline                                 */
 /****************************************************************************************************/
 
+/****************************************************************************************************/
+/*                                           HELP                                                   */
+/****************************************************************************************************/
+/// @brief QJSON_ONLINE(fromJson, toJson)
+/// @return 0: 成功
+///         1: QJsonDocument为空
+///         2: QJsonDocument类型不为对象
+///         3: 打开文件失败
+
+/****************************************************************************************************/
+/*                                          CONFIG                                                  */
+/****************************************************************************************************/
+#define QJSON_SUPPORT_QLIST
+// #define QJSON_SUPPORT_QLINKEDLIST
+// #define QJSON_SUPPORT_QVECTOR
+// #define QJSON_SUPPORT_QSTACK
+// #define QJSON_SUPPORT_QQUEUE
+// #define QJSON_SUPPORT_QSET
+
+/****************************************************************************************************/
+/*                                        HEAD FILE                                                 */
+/****************************************************************************************************/
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qjsonarray.h>
 #include <qfile.h>
-#include <qlist.h>
-#include <qvector.h>
 
 /****************************************************************************************************/
-/*                                           OBJECT                                                 */
+/*                                     OBJECT & BASIC TYPE                                          */
 /****************************************************************************************************/
+#pragma region 对象和基本类型的转换
 namespace _lm {
     template<typename T>
     inline QJsonObject fromJson(const QJsonValue& j, const T&) { return j.toObject(); }
@@ -30,12 +52,13 @@ namespace _lm {
     inline double toJson(const double& d) { return d; }
     inline QString toJson(const QString& s) { return s; }
 }
+#pragma endregion
 
 /****************************************************************************************************/
-/*                                           LIST                                                   */
+/*                                         CONTAINER                                                */
 /****************************************************************************************************/
-namespace _lm {
-#define QJSON_JSONVALUE_TO_LIST(TO) \
+#pragma region 数组与容器转换宏函数定义
+#define QJSON_JSONVALUE_TO_CONTAINER(TO) \
     { \
         r.clear(); \
         const auto& t = j.toArray(); \
@@ -44,8 +67,7 @@ namespace _lm {
         } \
         return r; \
     }
-
-#define QJSON_JSONVALUE_TO_NLIST(T) \
+#define QJSON_JSONVALUE_TO_NCONTAINER(T) \
     { \
         r.clear(); \
         const auto& t = j.toArray(); \
@@ -55,8 +77,7 @@ namespace _lm {
         } \
         return r; \
     }
-
-#define QJSON_LIST_TO_JSONARRAY(VALUE) \
+#define QJSON_CONTAINER_TO_JSONARRAY(VALUE) \
     { \
         QJsonArray r; \
         for (const auto& i : v) { \
@@ -64,121 +85,108 @@ namespace _lm {
         } \
         return r; \
     }
-    /*************************************************FROM JSON*************************************************/
-    // QJsonValue -> QList[]
-    template<typename T>
-    QList<T>& fromJson(const QJsonValue& j, QList<T>& r)
-        QJSON_JSONVALUE_TO_LIST(toObject);
-    template <> QList<bool>& fromJson(const QJsonValue& j, QList<bool>& r)
-        QJSON_JSONVALUE_TO_LIST(toBool);
-    template <> QList<int>& fromJson(const QJsonValue& j, QList<int>& r)
-        QJSON_JSONVALUE_TO_LIST(toInt);
-    template <> QList<double>& fromJson(const QJsonValue& j, QList<double>& r)
-        QJSON_JSONVALUE_TO_LIST(toDouble);
-    template <> QList<QString>& fromJson(const QJsonValue& j, QList<QString>& r)
-        QJSON_JSONVALUE_TO_LIST(toString);
 
-    // QJsonValue -> QList[][]
-    template<typename T>
-    QList<QList<T>>& fromJson(const QJsonValue& j, QList<QList<T>>& r)
-        QJSON_JSONVALUE_TO_NLIST(QList<T>);
-
-    // QJsonValue -> QList[][][]
-    template<typename T>
-    QList<QList<QList<T>>>& fromJson(const QJsonValue& j, QList<QList<QList<T>>>& r)
-        QJSON_JSONVALUE_TO_NLIST(QList<QList<T>>);
-
-    /*************************************************TO JSON*************************************************/
-    // QList[] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QList<T>& v)
-        QJSON_LIST_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray toJson(const QList<bool>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QList<int>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QList<double>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QList<QString>& v)
-        QJSON_LIST_TO_JSONARRAY(i);
-
-    // QList[][] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QList<QList<T>>& v)
-        QJSON_LIST_TO_JSONARRAY(toJson(i));
-
-    // QList[][][] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QList<QList<QList<T>>>& v)
-        QJSON_LIST_TO_JSONARRAY(toJson(i));
+#define QJSON_CONTAINER(CCLASS, TOCONTAINER, TONCONTAINER, TOJSONARRAY) \
+namespace _lm { \
+    template<typename T> \
+    CCLASS<T>& fromJson(const QJsonValue& j, CCLASS<T>& r) \
+        TOCONTAINER(toObject); \
+    template <> CCLASS<bool>& fromJson(const QJsonValue& j, CCLASS<bool>& r) \
+        TOCONTAINER(toBool); \
+    template <> CCLASS<int>& fromJson(const QJsonValue& j, CCLASS<int>& r) \
+        TOCONTAINER(toInt); \
+    template <> CCLASS<double>& fromJson(const QJsonValue& j, CCLASS<double>& r) \
+        TOCONTAINER(toDouble); \
+    template <> CCLASS<QString>& fromJson(const QJsonValue& j, CCLASS<QString>& r) \
+        TOCONTAINER(toString); \
+    template<typename T> \
+    CCLASS<CCLASS<T>>& fromJson(const QJsonValue& j, CCLASS<CCLASS<T>>& r) \
+        TONCONTAINER(CCLASS<T>); \
+    template<typename T> \
+    CCLASS<CCLASS<CCLASS<T>>>& fromJson(const QJsonValue& j, CCLASS<CCLASS<CCLASS<T>>>& r) \
+        TONCONTAINER(CCLASS<CCLASS<T>>); \
+    template<typename T> \
+    QJsonArray toJson(const CCLASS<T>& v) \
+        TOJSONARRAY(i.toJsonObject()); \
+    template <> QJsonArray toJson(const CCLASS<bool>& v) \
+        TOJSONARRAY(i); \
+    template <> QJsonArray toJson(const CCLASS<int>& v) \
+        TOJSONARRAY(i); \
+    template <> QJsonArray toJson(const CCLASS<double>& v) \
+        TOJSONARRAY(i); \
+    template <> QJsonArray toJson(const CCLASS<QString>& v) \
+        TOJSONARRAY(i); \
+    template<typename T> \
+    QJsonArray toJson(const CCLASS<CCLASS<T>>& v) \
+        TOJSONARRAY(toJson(i)); \
+    template<typename T> \
+    QJsonArray toJson(const CCLASS<CCLASS<CCLASS<T>>>& v) \
+        TOJSONARRAY(toJson(i)); \
 }
+#pragma endregion
+
+#pragma region 配置顺序容器
+#ifdef QJSON_SUPPORT_QLIST
+#include <qlist.h>
+QJSON_CONTAINER(QList, QJSON_JSONVALUE_TO_CONTAINER, QJSON_JSONVALUE_TO_NCONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QLIST
+
+#ifdef QJSON_SUPPORT_QLINKEDLIST
+#include <qlinkedlist.h>
+QJSON_CONTAINER(QLinkedList, QJSON_JSONVALUE_TO_CONTAINER, QJSON_JSONVALUE_TO_NCONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QLINKEDLIST
+
+#ifdef QJSON_SUPPORT_QVECTOR
+#include <qvector.h>
+QJSON_CONTAINER(QVector, QJSON_JSONVALUE_TO_CONTAINER, QJSON_JSONVALUE_TO_NCONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QVECTOR
+
+#ifdef QJSON_SUPPORT_QSTACK
+#include <qstack.h>
+QJSON_CONTAINER(QStack, QJSON_JSONVALUE_TO_CONTAINER, QJSON_JSONVALUE_TO_NCONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QSTACK
+
+#ifdef QJSON_SUPPORT_QQUEUE
+#include <qqueue.h>
+QJSON_CONTAINER(QQueue, QJSON_JSONVALUE_TO_CONTAINER, QJSON_JSONVALUE_TO_NCONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QQUEUE
+#pragma endregion
+
+#pragma region 配置关联容器
+#ifdef QJSON_SUPPORT_QSET
+#define QJSON_JSONVALUE_TO_ACONTAINER(TO) \
+    { \
+        r.clear(); \
+        const auto& t = j.toArray(); \
+        for (const auto& i : t) { \
+            r.insert(i.TO()); \
+        } \
+        return r; \
+    }
+#define QJSON_JSONVALUE_TO_NACONTAINER(T) \
+    { \
+        r.clear(); \
+        const auto& t = j.toArray(); \
+        for (const auto& i : t) { \
+            T r2; \
+            r.insert(fromJson(i.toArray(), r2)); \
+        } \
+        return r; \
+    }
+
+#include <qset.h>
+QJSON_CONTAINER(QSet, QJSON_JSONVALUE_TO_ACONTAINER, QJSON_JSONVALUE_TO_NACONTAINER, QJSON_CONTAINER_TO_JSONARRAY)
+#endif // QJSON_SUPPORT_QSET
+#pragma endregion
 
 /****************************************************************************************************/
-/*                                           VECTOR                                                 */
+/*                                       QJSON_ONLINE                                               */
 /****************************************************************************************************/
-namespace _lm {
-#define QJSON_JSONVALUE_TO_VECTOR(TO) QJSON_JSONVALUE_TO_LIST(TO)
-#define QJSON_JSONVALUE_TO_NVECTOR(TO) QJSON_JSONVALUE_TO_NLIST(TO)
-#define QJSON_VECTOR_TO_JSONARRAY(VALUE) QJSON_LIST_TO_JSONARRAY(VALUE)
-    /*************************************************FROM JSON*************************************************/
-    // QJsonValue -> QVector[]
-    template<typename T>
-    QVector<T>& fromJson(const QJsonValue& j, QVector<T>& r)
-        QJSON_JSONVALUE_TO_VECTOR(toObject);
-    template <> QVector<bool>& fromJson(const QJsonValue& j, QVector<bool>& r)
-        QJSON_JSONVALUE_TO_VECTOR(toBool);
-    template <> QVector<int>& fromJson(const QJsonValue& j, QVector<int>& r)
-        QJSON_JSONVALUE_TO_VECTOR(toInt);
-    template <> QVector<double>& fromJson(const QJsonValue& j, QVector<double>& r)
-        QJSON_JSONVALUE_TO_VECTOR(toDouble);
-    template <> QVector<QString>& fromJson(const QJsonValue& j, QVector<QString>& r)
-        QJSON_JSONVALUE_TO_VECTOR(toString);
-
-    // QJsonValue -> QVector[][]
-    template<typename T>
-    QVector<QVector<T>>& fromJson(const QJsonValue& j, QVector<QVector<T>>& r)
-        QJSON_JSONVALUE_TO_NVECTOR(QVector<T>);
-
-    // QJsonValue -> QVector[][][]
-    template<typename T>
-    QVector<QVector<QVector<T>>>& fromJson(const QJsonValue& j, QVector<QVector<QVector<T>>>& r)
-        QJSON_JSONVALUE_TO_NVECTOR(QVector<QVector<T>>);
-
-    /*************************************************TO JSON*************************************************/
-    // QVector[] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QVector<T>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i.toJsonObject());
-    template <> QJsonArray toJson(const QVector<bool>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QVector<int>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QVector<double>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-    template <> QJsonArray toJson(const QVector<QString>& v)
-        QJSON_VECTOR_TO_JSONARRAY(i);
-
-    // QVector[][] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QVector<QVector<T>>& v)
-        QJSON_VECTOR_TO_JSONARRAY(toJson(i));
-
-    // QVector[][][] -> QJsonArray
-    template<typename T>
-    QJsonArray toJson(const QVector<QVector<QVector<T>>>& v)
-        QJSON_VECTOR_TO_JSONARRAY(toJson(i));
-}
-
-/****************************************************************************************************/
-/*                                           JSON                                                   */
-/****************************************************************************************************/
+#pragma region QJSON_ONLINE 侵入式代码主要实现
 namespace _lm {
     inline QString& jsonKey(QString&& s) { return (s.at(0) == '_') ? s.remove(0, 1) : s; }
 }
 
-/****************************************************************************************************/
-/*                                           DEFINE                                                 */
-/****************************************************************************************************/
 #define TO_STR(s) #s
 
 #define TO_JSON_STR(KEY) _lm::jsonKey(QString(TO_STR(KEY)))
@@ -205,7 +213,9 @@ namespace _lm {
     return QJsonDocument(__j).toJson(__fm); } \
     int toJson(QFile& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { if (__f.open(QIODevice::WriteOnly)) { __f.write(toJson(__fm)); __f.flush(); __f.close(); return 0; } return 3; } \
     inline int toJson(QFile&& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return toJson(__f, __fm); }
+#pragma endregion
 
+#pragma region QJSON_ONLINE_ 系列重载宏函数
 #define QJSON_ONLINE_1(CLASS) \
     QJSON_ONLINE_CODE_BEGIN(CLASS) \
     QJSON_ONLINE_CODE_PART \
@@ -651,6 +661,7 @@ namespace _lm {
     QJSON_ONLINE_CODE_PART \
     QJSON_EXPAND_TO(KEY1) QJSON_EXPAND_TO(KEY2) QJSON_EXPAND_TO(KEY3) QJSON_EXPAND_TO(KEY4) QJSON_EXPAND_TO(KEY5) QJSON_EXPAND_TO(KEY6) QJSON_EXPAND_TO(KEY7) QJSON_EXPAND_TO(KEY8) QJSON_EXPAND_TO(KEY9) QJSON_EXPAND_TO(KEY10) QJSON_EXPAND_TO(KEY11) QJSON_EXPAND_TO(KEY12) QJSON_EXPAND_TO(KEY13) QJSON_EXPAND_TO(KEY14) QJSON_EXPAND_TO(KEY15) QJSON_EXPAND_TO(KEY16) QJSON_EXPAND_TO(KEY17) QJSON_EXPAND_TO(KEY18) QJSON_EXPAND_TO(KEY19) QJSON_EXPAND_TO(KEY20) QJSON_EXPAND_TO(KEY21) QJSON_EXPAND_TO(KEY22) QJSON_EXPAND_TO(KEY23) QJSON_EXPAND_TO(KEY24) QJSON_EXPAND_TO(KEY25) QJSON_EXPAND_TO(KEY26) QJSON_EXPAND_TO(KEY27) QJSON_EXPAND_TO(KEY28) QJSON_EXPAND_TO(KEY29) QJSON_EXPAND_TO(KEY30) QJSON_EXPAND_TO(KEY31) QJSON_EXPAND_TO(KEY32) QJSON_EXPAND_TO(KEY33) QJSON_EXPAND_TO(KEY34) QJSON_EXPAND_TO(KEY35) QJSON_EXPAND_TO(KEY36) QJSON_EXPAND_TO(KEY37) QJSON_EXPAND_TO(KEY38) QJSON_EXPAND_TO(KEY39) QJSON_EXPAND_TO(KEY40) QJSON_EXPAND_TO(KEY41) QJSON_EXPAND_TO(KEY42) QJSON_EXPAND_TO(KEY43) QJSON_EXPAND_TO(KEY44) QJSON_EXPAND_TO(KEY45) QJSON_EXPAND_TO(KEY46) QJSON_EXPAND_TO(KEY47) QJSON_EXPAND_TO(KEY48) QJSON_EXPAND_TO(KEY49) QJSON_EXPAND_TO(KEY50) QJSON_EXPAND_TO(KEY51) QJSON_EXPAND_TO(KEY52) QJSON_EXPAND_TO(KEY53) QJSON_EXPAND_TO(KEY54) QJSON_EXPAND_TO(KEY55) QJSON_EXPAND_TO(KEY56) QJSON_EXPAND_TO(KEY57) QJSON_EXPAND_TO(KEY58) QJSON_EXPAND_TO(KEY59) QJSON_EXPAND_TO(KEY60) QJSON_EXPAND_TO(KEY61) QJSON_EXPAND_TO(KEY62) QJSON_EXPAND_TO(KEY63) \
     QJSON_ONLINE_CODE_END
+#pragma endregion
 
 /****************************************************************************************************/
 /*                                           EXPORT                                                 */
@@ -662,12 +673,6 @@ namespace _lm {
 #define PRIVATE_MACRO_CHOOSE_HELPER2(M, count) M##count
 #define PRIVATE_MACRO_CHOOSE_HELPER1(M, count) PRIVATE_MACRO_CHOOSE_HELPER2(M, count)
 #define PRIVATE_MACRO_CHOOSE_HELPER(M, count) PRIVATE_MACRO_CHOOSE_HELPER1(M, count)
-
-/// @brief QJSON_ONLINE(fromJson, toJson)
-/// @return 0: 成功
-///         1: QJsonDocument为空
-///         2: QJsonDocument类型不为对象
-///         3: 打开文件失败
 
 #ifdef WIN32
 #define EXPAND(...) __VA_ARGS__
