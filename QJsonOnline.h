@@ -148,7 +148,7 @@ namespace _lm {
     // QVector[] -> QJsonArray
     template<typename T>
     QJsonArray toJson(const QVector<T>& v)
-        QJSON_LIST_TO_JSONARRAY(i.toJsonObject());
+        QJSON_VECTOR_TO_JSONARRAY(i.toJsonObject());
     template <> QJsonArray toJson(const QVector<bool>& v)
         QJSON_VECTOR_TO_JSONARRAY(i);
     template <> QJsonArray toJson(const QVector<int>& v)
@@ -161,12 +161,12 @@ namespace _lm {
     // QVector[][] -> QJsonArray
     template<typename T>
     QJsonArray toJson(const QVector<QVector<T>>& v)
-        QJSON_LIST_TO_JSONARRAY(toJson(i));
+        QJSON_VECTOR_TO_JSONARRAY(toJson(i));
 
     // QVector[][][] -> QJsonArray
     template<typename T>
     QJsonArray toJson(const QVector<QVector<QVector<T>>>& v)
-        QJSON_LIST_TO_JSONARRAY(toJson(i));
+        QJSON_VECTOR_TO_JSONARRAY(toJson(i));
 }
 
 /****************************************************************************************************/
@@ -190,24 +190,21 @@ namespace _lm {
     __j[TO_JSON_STR(KEY)] = _lm::toJson(KEY);
 
 #define QJSON_ONLINE_CODE_BEGIN(CLASS) \
-    CLASS(const QJsonObject& __j) { fromJson(__j); } \
     CLASS(const QByteArray& __s) { fromJson(__s); } \
     CLASS(const QString& __s) { fromJson(__s); } \
     CLASS(QFile& __f) { fromJson(__f); } \
     CLASS(QFile&& __f) { fromJson(__f); } \
-    void fromJson(const QJsonObject& __j) {
+    int fromJson(const QByteArray& __s) { const auto& __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return 1; } if (__d.isObject()) { const auto& __j = __d.object();
 #define QJSON_ONLINE_CODE_PART \
-    } \
-    void fromJson(const QByteArray& __s) { auto __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return; } if (__d.isObject()) { fromJson(__d.object()); } } \
-    inline void fromJson(const QString& __s) { return fromJson(__s.toUtf8()); } \
-    bool fromJson(QFile& __f) { if (__f.open(QIODevice::ReadOnly)) { fromJson(__f.readAll()); __f.close(); return true; } return false; } \
-    bool fromJson(QFile&& __f) { if (__f.open(QIODevice::ReadOnly)) { fromJson(__f.readAll()); __f.close(); return true; } return false; } \
-    QJsonObject toJsonObject() const { QJsonObject __j;
+    return 0; } return 2; } \
+    inline int fromJson(const QString& __s) { return fromJson(__s.toUtf8()); } \
+    int fromJson(QFile& __f) { if (__f.open(QIODevice::ReadOnly)) { const auto res = fromJson(__f.readAll()); __f.close(); return res; } return 3; } \
+    inline int fromJson(QFile&& __f) { return fromJson(__f); } \
+    QByteArray toJson(QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { QJsonObject __j;
 #define QJSON_ONLINE_CODE_END \
-    return __j; } \
-    inline QByteArray toJson(QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(__fm); } \
-    bool toJson(QFile& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { if (__f.open(QIODevice::WriteOnly)) { __f.write(toJson(__fm)); __f.flush(); __f.close(); return true; } return false; } \
-    bool toJson(QFile&& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { if (__f.open(QIODevice::WriteOnly)) { __f.write(toJson(__fm)); __f.flush(); __f.close(); return true; } return false; }
+    return QJsonDocument(__j).toJson(__fm); } \
+    int toJson(QFile& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { if (__f.open(QIODevice::WriteOnly)) { __f.write(toJson(__fm)); __f.flush(); __f.close(); return 0; } return 3; } \
+    inline int toJson(QFile&& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return toJson(__f, __fm); }
 
 #define QJSON_ONLINE_1(CLASS) \
     QJSON_ONLINE_CODE_BEGIN(CLASS) \
@@ -665,6 +662,12 @@ namespace _lm {
 #define PRIVATE_MACRO_CHOOSE_HELPER2(M, count) M##count
 #define PRIVATE_MACRO_CHOOSE_HELPER1(M, count) PRIVATE_MACRO_CHOOSE_HELPER2(M, count)
 #define PRIVATE_MACRO_CHOOSE_HELPER(M, count) PRIVATE_MACRO_CHOOSE_HELPER1(M, count)
+
+/// @brief QJSON_ONLINE(fromJson, toJson)
+/// @return 0: 成功
+///         1: QJsonDocument为空
+///         2: QJsonDocument类型不为对象
+///         3: 打开文件失败
 
 #ifdef WIN32
 #define EXPAND(...) __VA_ARGS__
