@@ -9,7 +9,17 @@
 /****************************************************************************************************/
 /*                                           HELP                                                   */
 /****************************************************************************************************/
-/// @brief QJSON_ONLINE(fromJson, toJson)
+/// 代码中使用 QJSON_ONLINE 宏函数将代码入侵到struct/class内
+/// 使用格式如下:
+///   QJSON_ONLINE(ClassName, MemberName, MemberName...)
+///   ClassName  入侵对象的结构体/类名
+///   MemberName 入侵对象的成员名，最大支持63个成员变量
+/// 注意: QList以外的容器需要在CONFIG配置下方使用宏定义进行配置使开启支持
+///       对于json key名称为数字开头等情况，成员变量命名请使用 _ 开头加对应的数字，代码会自动忽略_并匹配json key名称
+///       对于json key名称为_开头的情况，成员变量命名请使用 _ 开头加对应个数的_，代码会自动忽略_并匹配json key名称
+///       json数组类型目前最大仅支持3维数组，即最大遍历深度为3层
+
+/// @brief QJSON_ONLINE 侵入代码中的fromJson、toJson函数返回值详解
 /// @return 0: 成功
 ///         1: QJsonDocument为空
 ///         2: QJsonDocument类型不为对象
@@ -198,19 +208,22 @@ namespace _lm {
     __j[TO_JSON_STR(KEY)] = _lm::toJson(KEY);
 
 #define QJSON_ONLINE_CODE_BEGIN(CLASS) \
+    CLASS(const QJsonObject& __j) { fromJson(__j); } \
     CLASS(const QByteArray& __s) { fromJson(__s); } \
     CLASS(const QString& __s) { fromJson(__s); } \
     CLASS(QFile& __f) { fromJson(__f); } \
     CLASS(QFile&& __f) { fromJson(__f); } \
-    int fromJson(const QByteArray& __s) { const auto& __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return 1; } if (__d.isObject()) { const auto& __j = __d.object();
+    void fromJson(const QJsonObject& __j) {
 #define QJSON_ONLINE_CODE_PART \
-    return 0; } return 2; } \
+    } \
+    int fromJson(const QByteArray& __s) { const auto& __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return 1; } if (__d.isObject()) { fromJson(__d.object()); return 0; } return 2; } \
     inline int fromJson(const QString& __s) { return fromJson(__s.toUtf8()); } \
     int fromJson(QFile& __f) { if (__f.open(QIODevice::ReadOnly)) { const auto res = fromJson(__f.readAll()); __f.close(); return res; } return 3; } \
     inline int fromJson(QFile&& __f) { return fromJson(__f); } \
-    QByteArray toJson(QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { QJsonObject __j;
+    QJsonObject toJsonObject() const { QJsonObject __j;
 #define QJSON_ONLINE_CODE_END \
-    return QJsonDocument(__j).toJson(__fm); } \
+    return __j; } \
+    inline QByteArray toJson(QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(__fm); } \
     int toJson(QFile& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { if (__f.open(QIODevice::WriteOnly)) { __f.write(toJson(__fm)); __f.flush(); __f.close(); return 0; } return 3; } \
     inline int toJson(QFile&& __f, QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return toJson(__f, __fm); }
 #pragma endregion
