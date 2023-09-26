@@ -16,7 +16,6 @@
 ///   MemberName 入侵对象的成员名，最大支持63个成员变量
 /// 注意: 对于json key名称为数字开头等情况，成员变量命名请使用 _ 开头加对应的数字，代码会自动忽略_并匹配json key名称
 ///       对于json key名称为_开头的情况，成员变量命名请使用 _ 开头加对应个数的_，代码会自动忽略_并匹配json key名称
-///       json数组类型目前最大仅支持3维数组，即最大遍历深度为3层
 
 /// @brief QJSON_ONLINE 侵入代码中的fromJson、toJson函数返回值详解
 /// @return 0: 成功
@@ -110,38 +109,35 @@ namespace _lm {
 namespace _lm { \
     template<typename T> \
     CCLASS<T>& fromJson(const QJsonValue& j, const QString& k, CCLASS<T>& r) \
-        JVTOCONTAINER(toObject); \
+        JVTOCONTAINER(toObject) \
     template <> CCLASS<bool>& fromJson(const QJsonValue& j, const QString& k, CCLASS<bool>& r) \
-        JVTOCONTAINER(toBool); \
+        JVTOCONTAINER(toBool) \
     template <> CCLASS<int>& fromJson(const QJsonValue& j, const QString& k, CCLASS<int>& r) \
-        JVTOCONTAINER(toInt); \
+        JVTOCONTAINER(toInt) \
     template <> CCLASS<double>& fromJson(const QJsonValue& j, const QString& k, CCLASS<double>& r) \
-        JVTOCONTAINER(toDouble); \
+        JVTOCONTAINER(toDouble) \
     template <> CCLASS<QString>& fromJson(const QJsonValue& j, const QString& k, CCLASS<QString>& r) \
-        JVTOCONTAINER(toString); \
+        JVTOCONTAINER(toString) \
     template<typename T> \
     CCLASS<CCLASS<T>>& fromJson(const QJsonValue& j, const QString& k, CCLASS<CCLASS<T>>& r) \
-        JVTONCONTAINER(CCLASS<T>); \
-    template<typename T> \
-    CCLASS<CCLASS<CCLASS<T>>>& fromJson(const QJsonValue& j, const QString& k, CCLASS<CCLASS<CCLASS<T>>>& r) \
-        JVTONCONTAINER(CCLASS<CCLASS<T>>); \
+        JVTONCONTAINER(CCLASS<T>) \
     template<typename T> \
     QJsonArray toJson(const CCLASS<T>& v) \
-        NCTOJSONARRAY(i.toJsonObject()); \
+        NCTOJSONARRAY(i.toJsonObject()) \
     template <> QJsonArray toJson(const CCLASS<bool>& v) \
-        NCTOJSONARRAY(i); \
+        NCTOJSONARRAY(i) \
     template <> QJsonArray toJson(const CCLASS<int>& v) \
-        NCTOJSONARRAY(i); \
+        NCTOJSONARRAY(i) \
     template <> QJsonArray toJson(const CCLASS<double>& v) \
-        NCTOJSONARRAY(i); \
+        NCTOJSONARRAY(i) \
     template <> QJsonArray toJson(const CCLASS<QString>& v) \
-        NCTOJSONARRAY(i); \
+        NCTOJSONARRAY(i) \
     template<typename T> \
     QJsonArray toJson(const CCLASS<CCLASS<T>>& v) \
-        NCTOJSONARRAY(toJson(i)); \
+        NCTOJSONARRAY(toJson(i)) \
     template<typename T> \
     QJsonArray toJson(const CCLASS<CCLASS<CCLASS<T>>>& v) \
-        NCTOJSONARRAY(toJson(i)); \
+        NCTOJSONARRAY(toJson(i)) \
 }
 #define QJSONONLINE_CONTAINER_CONVERT_SIMPLE(CCLASS) \
     QJSONONLINE_CONTAINER_CONVERT(CCLASS, JSONVALUE_TO_CONTAINER, JSONVALUE_TO_NCONTAINER, NCONTAINER_TO_JSONARRAY)
