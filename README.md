@@ -16,7 +16,7 @@
   QJSON_ONLINE(ClassName, MemberName, MemberName...)
   ClassName  入侵对象的结构体/类名
   MemberName 入侵对象的成员名，最大支持63个成员变量
-注意: QList以外的容器需要在CONFIG配置下方使用宏定义进行配置使开启支持
+注意:
       对于json key名称为数字开头等情况，成员变量命名请使用 _ 开头加对应的数字，代码会自动忽略_并匹配json key名称
       对于json key名称为_开头的情况，成员变量命名请使用 _ 开头加对应个数的_，代码会自动忽略_并匹配json key名称
       json数组类型目前最大仅支持3维数组，即最大遍历深度为3层
@@ -27,46 +27,6 @@
         2: QJsonDocument类型不为对象
         3: 打开文件失败
 ```
-
-# 示例
-```
-{
-    "s": "hello world",
-    "1": 1024,
-    "_": [
-        {
-            "s": "hello qjsononline",
-            "1": 666,
-            "_": [
-                {
-                    "s": "QJSON_ONLINE",
-                    "1": 63,
-                    "_": []
-                }
-            ]
-        },
-        {
-            "s": "hello qjsononline2",
-            "1": 666888,
-            "_": [
-                {
-                    "s": "QJSON_ONLINE_1",
-                    "1": 636363
-                }
-            ]
-        }
-    ]
-}
-struct/class MyStruct
-{
-    QString s;
-    int _1;
-    QList<MyStruct> __;
-
-    QJSON_ONLINE(MyStruct, s, _1, __);
-};
-```
-
 
 # 鸣谢
 nlohmann json(https://github.com/nlohmann/json)
