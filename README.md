@@ -19,7 +19,6 @@
 注意:
       对于json key名称为数字开头等情况，成员变量命名请使用 _ 开头加对应的数字，代码会自动忽略_并匹配json key名称
       对于json key名称为_开头的情况，成员变量命名请使用 _ 开头加对应个数的_，代码会自动忽略_并匹配json key名称
-      json数组类型目前最大仅支持3维数组，即最大遍历深度为3层
 
 @brief QJSON_ONLINE 侵入代码中的fromJson、toJson函数返回值详解
 @return 0: 成功
