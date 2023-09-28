@@ -55,7 +55,7 @@ namespace t1
 
     void main()
     {
-        const auto jsonStr = QString(R"({"key":"value"})");
+        const auto jsonStr = QByteArray(R"({"key":"value"})");
         KV kv;
         kv.fromJson(jsonStr);
         qDebug() << kv.key;
@@ -76,7 +76,7 @@ namespace t2
 
     void main()
     {
-        const auto jsonStr = QString(R"({"list":[1,2,3,4,5,6,7,8,9,0,345,2,213,456,5,7,423,23,4]})");
+        const auto jsonStr = QByteArray(R"({"list":[1,2,3,4,5,6,7,8,9,0,345,2,213,456,5,7,423,23,4]})");
         Arr ar;
         ar.fromJson(jsonStr);
         qDebug() << ar.list;
@@ -151,9 +151,9 @@ namespace t4
     void main()
     {
         T t;
-        qDebug() << t.fromJson(QString(""));    // 1
+        qDebug() << t.fromJson(QByteArray(""));    // 1
         qDebug() << t.fromJson(QByteArray("")); // 1
-        qDebug() << t.fromJson(QString("[]"));  // 2
+        qDebug() << t.fromJson(QByteArray("[]"));  // 2
         // qDebug() << t.fromJson(QFile(""));      // 3
         qDebug() << t.toJson();                 // { }
         // qDebug() << t.toJson(QFile(""));        // 3
@@ -462,7 +462,7 @@ namespace t10
 
     void main()
     {
-        SVe v(QString(R"({"v":[[[[[[[[[{"k":"1"}]]]]]]]]]})"));
+        SVe v(QByteArray(R"({"v":[[[[[[[[[{"k":"1"}]]]]]]]]]})"));
         utils::writeAll(v.toJson(), "t10.json");
     }
 }
