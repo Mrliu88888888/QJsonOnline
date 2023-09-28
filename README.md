@@ -1,4 +1,4 @@
-# QJsonOnline
+﻿# QJsonOnline
 通过宏函数方式将代码入侵至struct/class内，完成json与对象的相互转换。
 
 # 开发简介
@@ -17,14 +17,12 @@
   ClassName  入侵对象的结构体/类名
   MemberName 入侵对象的成员名，最大支持63个成员变量
 注意:
-      对于json key名称为数字开头等情况，成员变量命名请使用 _ 开头加对应的数字，代码会自动忽略_并匹配json key名称
-      对于json key名称为_开头的情况，成员变量命名请使用 _ 开头加对应个数的_，代码会自动忽略_并匹配json key名称
+      对于json key名称为数字或_开头等情况，成员变量命名请使用_开头，代码会自动忽略_并匹配json key名称
 
 @brief QJSON_ONLINE 侵入代码中的fromJson、toJson函数返回值详解
 @return 0: 成功
         1: QJsonDocument为空
         2: QJsonDocument类型不为对象
-        3: 打开文件失败
 ```
 
 # 鸣谢
