@@ -2,7 +2,8 @@
 
 #include <QObject>
 
-class QJsonOnlineTest : public QObject
+class QJsonOnlineTest
+    : public QObject
 {
     Q_OBJECT
 
