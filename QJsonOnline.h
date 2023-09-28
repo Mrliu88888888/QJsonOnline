@@ -251,13 +251,13 @@ namespace _lm {
     j[TO_JSON_STR(KEY)] = _lm::toJson(this->KEY);
 
 #define QJSON_ONLINE_CODE_BEGIN(CLASS) \
-    CLASS(const QJsonObject& j) { fromJson(j); } \
+    CLASS(const QJsonObject& j) { fromJsonObject(j); } \
     CLASS(const QByteArray& s) { fromJson(s); } \
-    void fromJson(const QJsonObject& j) {
+    virtual void fromJsonObject(const QJsonObject& j) {
 #define QJSON_ONLINE_CODE_PART \
     } \
-    int fromJson(const QByteArray& s) { const auto& d = QJsonDocument::fromJson(s); if (d.isNull()) { return 1; } if (d.isObject()) { fromJson(d.object()); return 0; } return 2; } \
-    QJsonObject toJsonObject() const { QJsonObject j;
+    int fromJson(const QByteArray& s) { const auto& d = QJsonDocument::fromJson(s); if (d.isNull()) { return 1; } if (d.isObject()) { fromJsonObject(d.object()); return 0; } return 2; } \
+    virtual QJsonObject toJsonObject() const { QJsonObject j;
 #define QJSON_ONLINE_CODE_END \
     return j; } \
     inline QByteArray toJson(QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(fm); }
