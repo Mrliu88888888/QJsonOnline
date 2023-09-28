@@ -165,7 +165,7 @@ QJSONONLINE_CONTAINER_CONVERT_SIMPLE(QQueue)
 #define JSONVALUE_TO_SETCONTAINER(TO) \
     { \
         r.clear(); \
-        const auto& t = j.toArray(); \
+        const auto& t = j.isObject() ? j.toObject().value(k).toArray() : j.toArray(); \
         for (const auto& i : t) { \
             r.insert(i.TO()); \
         } \
@@ -174,10 +174,10 @@ QJSONONLINE_CONTAINER_CONVERT_SIMPLE(QQueue)
 #define JSONVALUE_TO_NSETCONTAINER(T) \
     { \
         r.clear(); \
-        const auto& t = j.toArray(); \
+        const auto& t = j.isObject() ? j.toObject().value(k).toArray() : j.toArray(); \
         for (const auto& i : t) { \
             T r2; \
-            r.insert(fromJson(i.toArray(), r2)); \
+            r.insert(fromJson(i, "", r2)); \
         } \
         return r; \
     }
