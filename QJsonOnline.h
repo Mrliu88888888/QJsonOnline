@@ -245,24 +245,22 @@ namespace _lm {
 #define TO_JSON_STR(KEY) _lm::jsonKey(QString(TO_STR(KEY)))
 
 #define QJSON_EXPAND_FROM(KEY) \
-    KEY = _lm::fromJson(__j, TO_JSON_STR(KEY), KEY);
+    this->KEY = _lm::fromJson(j, TO_JSON_STR(KEY), this->KEY);
 
 #define QJSON_EXPAND_TO(KEY) \
-    __j[TO_JSON_STR(KEY)] = _lm::toJson(KEY);
+    j[TO_JSON_STR(KEY)] = _lm::toJson(this->KEY);
 
 #define QJSON_ONLINE_CODE_BEGIN(CLASS) \
-    CLASS(const QJsonObject& __j) { fromJson(__j); } \
-    CLASS(const QByteArray& __s) { fromJson(__s); } \
-    CLASS(const QString& __s) { fromJson(__s); } \
-    void fromJson(const QJsonObject& __j) {
+    CLASS(const QJsonObject& j) { fromJson(j); } \
+    CLASS(const QByteArray& s) { fromJson(s); } \
+    void fromJson(const QJsonObject& j) {
 #define QJSON_ONLINE_CODE_PART \
     } \
-    int fromJson(const QByteArray& __s) { const auto& __d = QJsonDocument::fromJson(__s); if (__d.isNull()) { return 1; } if (__d.isObject()) { fromJson(__d.object()); return 0; } return 2; } \
-    inline int fromJson(const QString& __s) { return fromJson(__s.toUtf8()); } \
-    QJsonObject toJsonObject() const { QJsonObject __j;
+    int fromJson(const QByteArray& s) { const auto& d = QJsonDocument::fromJson(s); if (d.isNull()) { return 1; } if (d.isObject()) { fromJson(d.object()); return 0; } return 2; } \
+    QJsonObject toJsonObject() const { QJsonObject j;
 #define QJSON_ONLINE_CODE_END \
-    return __j; } \
-    inline QByteArray toJson(QJsonDocument::JsonFormat __fm = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(__fm); }
+    return j; } \
+    inline QByteArray toJson(QJsonDocument::JsonFormat fm = QJsonDocument::JsonFormat::Compact) const { return QJsonDocument(toJsonObject()).toJson(fm); }
 #pragma endregion
 
 #pragma region QJSON_ONLINE_[NUM] 宏函数重载
