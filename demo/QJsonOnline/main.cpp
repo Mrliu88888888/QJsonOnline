@@ -2,10 +2,45 @@
 #include <QtCore/QCoreApplication>
 #include <qtextcodec.h>
 #include <qdebug.h>
+#include <qdatetime.h>
+#include <qfile.h>
 
 #ifdef _WIN32
 #pragma execution_character_set("utf-8")
 #endif
+
+namespace utils
+{
+    QByteArray readAll(QFile& f)
+    {
+        if (f.open(QIODevice::ReadOnly))
+        {
+            const auto res = f.readAll();
+            f.close();
+            return res;
+        }
+        return "";
+    }
+
+    inline QByteArray readAll(QFile&& f) { return readAll(f); }
+
+    inline QByteArray readAll(const QString& filename) { return readAll(QFile(filename)); }
+
+    bool writeAll(const QByteArray& str, QFile& f)
+    {
+        if (f.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+            const auto len = f.write(str);
+            f.close();
+            return len == str.length();
+        }
+        return false;
+    }
+
+    inline bool writeAll(const QByteArray& str, QFile&& f) { return writeAll(str, f); }
+
+    inline bool writeAll(const QByteArray& str, const QString& filename) { return writeAll(str, QFile(filename)); }
+}
 
 namespace t1
 {
@@ -100,7 +135,7 @@ namespace t3
     */
     void main()
     {
-        MyClass m(QFile("t3.json"));
+        MyClass m(utils::readAll("t3.json"));
         qDebug() << m.toJson();
     }
 }
@@ -119,9 +154,9 @@ namespace t4
         qDebug() << t.fromJson(QString(""));    // 1
         qDebug() << t.fromJson(QByteArray("")); // 1
         qDebug() << t.fromJson(QString("[]"));  // 2
-        qDebug() << t.fromJson(QFile(""));      // 3
+        // qDebug() << t.fromJson(QFile(""));      // 3
         qDebug() << t.toJson();                 // { }
-        qDebug() << t.toJson(QFile(""));        // 3
+        // qDebug() << t.toJson(QFile(""));        // 3
     }
 }
 
@@ -163,9 +198,9 @@ namespace t5
 
     void main()
     {
-        MyClass m(QFile("ip.json"));
+        MyClass m(utils::readAll("ip.json"));
         qDebug() << m.toJson();
-        qDebug() << m.toJson(QFile("ip2.json"), QJsonDocument::Indented);
+        qDebug() << utils::writeAll(m.toJson(QJsonDocument::Indented), "ip2.json");
     }
 }
 
@@ -202,7 +237,7 @@ namespace t6
     void main()
     {
         MyStruct s;
-        s.fromJson(QFile("his.json"));
+        s.fromJson(utils::readAll("his.json"));
         for (auto& res : s.result) {
             if (res.year == "-565") {
                 qDebug() << "find it";
@@ -211,7 +246,7 @@ namespace t6
                 break;
             }
         }
-        qDebug() << s.toJson(QFile("his2.json"));
+        qDebug() << utils::writeAll(s.toJson(), "his2.json");
     }
 }
 
@@ -257,8 +292,8 @@ namespace t7
 
     void main()
     {
-        MyStruct m(QFile("hot.json"));
-        qDebug() << m.toJson(QFile("hot2.json"), QJsonDocument::Indented);
+        MyStruct m(utils::readAll("hot.json"));
+        qDebug() << utils::writeAll(m.toJson(QJsonDocument::Indented), "hot2.json");
     }
 }
 
@@ -327,14 +362,14 @@ namespace t8
     void main()
     {
         MyClass m;
-        m.fromJson(QFile("ol.json"));
+        m.fromJson(utils::readAll("ol.json"));
         for (auto& res : m.getResult().getMedalsList())
         {
             if (res.getCountryid() == "CHN") {
                 res.getGold() = "99";
             }
         }
-        m.toJson(QFile("ol2.json"));
+        utils::writeAll(m.toJson(), "ol2.json");
     }
 }
 
@@ -402,10 +437,106 @@ namespace t9
 
     void main()
     {
-        Mov m(QFile("mov.json"));
+        Mov m(utils::readAll("mov.json"));
         m.print();
     }
 }
+
+namespace t10
+{
+    struct SData
+    {
+        SData() {}
+
+        QString k;
+
+        QJSON_ONLINE(SData, k);
+    };
+
+    struct SVe
+    {
+        QVector<QVector<QVector<QVector<QVector<QVector<QVector<QVector<QVector<SData>>>>>>>>> v;
+
+        QJSON_ONLINE(SVe, v);
+    };
+
+    void main()
+    {
+        SVe v(QString(R"({"v":[[[[[[[[[{"k":"1"}]]]]]]]]]})"));
+        utils::writeAll(v.toJson(), "t10.json");
+    }
+}
+
+namespace t11
+{
+    class Obj
+    {
+    public:
+        Obj() = default;
+
+        QString _1;
+        QString n;
+        QString _22;
+        QString __;
+
+        QJSON_ONLINE(Obj, _1, n, _22, __)
+    };
+
+    void main()
+    {
+        const auto cstr =
+            R"({
+                "1": "hello",
+                "n": "123",
+                "22": "456",
+                "_": "++"
+                })";
+
+        Obj o;
+        o.fromJson(QByteArray(cstr));
+        qDebug() << utils::writeAll(o.toJson(QJsonDocument::Indented), "t11.json");
+    }
+}
+
+#pragma region Log
+QFile* gFileLog = NULL;
+
+const char* const msgHead[] = {
+    "Debug   ",
+    "Warning ",
+    "Critical",
+    "Fatal   ",
+    "Info    "
+};
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    QString current_date_time = "";  //  QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss ddd");
+
+    if (gFileLog) {
+        QTextStream tWrite(gFileLog);
+
+        QString msgText = "%1 | %6 | %2:%3, %4 | %5\n";
+        msgText = msgText.arg(msgHead[type]).arg(context.file).arg(context.line).arg(context.function).arg(localMsg.constData()).arg(current_date_time);
+        //gFileLog->write(msgText.toLocal8Bit(), msgText.length());
+        tWrite << msgText;
+    }
+    else {
+        fprintf(stderr, "%s | %s | %s:%u, %s | %s\n", msgHead[type], current_date_time.toLocal8Bit().constData(), context.file, context.line, context.function, localMsg.constData());
+    }
+}
+
+void logSysInit(QString filePath)
+{
+    gFileLog = new QFile(filePath);
+    if (!gFileLog->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return;
+    }
+    //初始化自定义日志处理函数myMessageOutput
+    qInstallMessageHandler(myMessageOutput);
+}
+#pragma endregion
 
 int main(int argc, char* argv[])
 {
@@ -414,6 +545,8 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     system("chcp 65001");
 #endif
+
+    logSysInit("my.log");
 
     t1::main();
     t2::main();
@@ -424,6 +557,8 @@ int main(int argc, char* argv[])
     t7::main();
     t8::main();
     t9::main();
+    t10::main();
+    t11::main();
 
     return 0;
 }
