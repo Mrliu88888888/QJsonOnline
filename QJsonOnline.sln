@@ -12,8 +12,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QJson2CppStudio", "QJson2Cp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QJsonOnlineTest", "QJsonOnlineTest\QJsonOnlineTest.vcxproj", "{6CEC43B7-6C07-45CA-B5D6-2755DA0F7396}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QJsonOnline", "QJsonOnline\QJsonOnline.vcxproj", "{B64493AE-8FD6-465C-BB3D-91B4E3B3966E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -28,10 +26,6 @@ Global
 		{6CEC43B7-6C07-45CA-B5D6-2755DA0F7396}.Debug|x64.Build.0 = Debug|x64
 		{6CEC43B7-6C07-45CA-B5D6-2755DA0F7396}.Release|x64.ActiveCfg = Release|x64
 		{6CEC43B7-6C07-45CA-B5D6-2755DA0F7396}.Release|x64.Build.0 = Release|x64
-		{B64493AE-8FD6-465C-BB3D-91B4E3B3966E}.Debug|x64.ActiveCfg = Debug|x64
-		{B64493AE-8FD6-465C-BB3D-91B4E3B3966E}.Debug|x64.Build.0 = Debug|x64
-		{B64493AE-8FD6-465C-BB3D-91B4E3B3966E}.Release|x64.ActiveCfg = Release|x64
-		{B64493AE-8FD6-465C-BB3D-91B4E3B3966E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
